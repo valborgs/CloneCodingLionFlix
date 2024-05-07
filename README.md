@@ -1,6 +1,7 @@
 # Flutter 종합 예제
 
 ---
+## 2024-05-03
 
 1. 코드 삭제
 - lib/main.dart
@@ -678,4 +679,789 @@ var movieTitles = [
             dotHeight: 5,
         ),
     ),
+```
+
+## 2024-05-07
+
+### 미리보기 부분 구현
+- 영화들을 좌우로 스크롤해서 확인할 수 있도록 구성한다.
+- 영화 포스터를 둥근 모양으로 보여준다.
+
+1. widget/home_circle_slider.dart 파일을 만든다.
+2. StatefulWidget 코드를 작성해준다.
+```dart
+import 'package:flutter/material.dart';
+
+class HomeCircleSlider extends StatefulWidget {
+   const HomeCircleSlider({super.key});
+
+   @override
+   State<HomeCircleSlider> createState() => _HomeCircleSliderState();
+}
+
+class _HomeCircleSliderState extends State<HomeCircleSlider> {
+   @override
+   Widget build(BuildContext context) {
+      return const Placeholder();
+   }
+}
+
+```
+
+3. HomeScreen의 body를 ListView 사용으로 변경한다.
+```dart
+      body: ListView(
+         children: [
+            // 상단 회전 목마
+            HomeCarouselSlider(),
+         ],
+      ),
+```
+
+4. 미리 보기 부분을 배치한다.
+```dart
+      body: ListView(
+         children: [
+            // 상단 회전 목마
+            HomeCarouselSlider(),
+            Padding(padding: EdgeInsets.only(top: 20)),
+            // 미리 보기 부분
+            HomeCircleSlider(),
+         ],
+      ),
+```
+
+5. ListView 항목 하나를 구성하기 위한 함수를 작성해준다.
+```dart
+// ListView의 항목 하나를 구성하여 반환하는 함수
+Widget makeListItem(){
+   return Container(
+      padding: EdgeInsets.only(right: 10),
+      // 동그라미 형태로 보여주는 컨테이너
+      child: CircleAvatar(
+         // 배경 이미지
+         backgroundImage: AssetImage("lib/assets/images/movie1.jpg"),
+         // 크기
+         radius: 48,
+      ),
+   );
+}
+```
+
+6. ListView를 배치해준다.
+```dart
+return Container(
+   padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+   child: Column(
+   crossAxisAlignment: CrossAxisAlignment.start,
+   children: [
+      Text("미리보기"),
+      Container(
+         // 리스트 뷰의 크기를 컨테이너를 통해 설정한다.
+         height: 120,
+         // 다수의 항목을 보여주는 리스트 뷰는 builder를 통해 구성한다.
+         child: ListView.builder(
+            // 스크롤 방향은 가로 방향으로 설정한다.
+            scrollDirection: Axis.horizontal,
+            // 전체 항목의 개수
+            itemCount: 10,
+            // 항목 하나를 구성하기 위해 호출하는 함수
+            // 여기서 반환하는 위젯이 항목 하나가 된다.
+            itemBuilder: (context, index) {
+              return makeListItem();
+            },
+         ),
+      ),
+   ],
+   ),
+);
+```
+
+### 지금 뜨는 컨텐츠 배치
+- HomeCircleSlider와 거의 비슷하여 이미지가 네모 모양으로 나타나게 한다.
+
+1. widget/home_box_slider.dart 파일을 만든다.
+
+2. StatefulWidget 기본 코드를 작성해준다.
+
+```dart
+import 'package:flutter/material.dart';
+
+class HomeBoxSlider extends StatefulWidget {
+  const HomeBoxSlider({super.key});
+
+  @override
+  State<HomeBoxSlider> createState() => _HomeBoxSliderState();
+}
+
+class _HomeBoxSliderState extends State<HomeBoxSlider> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+```
+
+3. HomeScreen에 배치해준다.
+```dart
+body: ListView(
+   children: [
+      // 상단 회전 목마
+      HomeCarouselSlider(),
+      Padding(padding: EdgeInsets.only(top: 20)),
+      // 미리 보기 부분
+      HomeCircleSlider(),
+      Padding(padding: EdgeInsets.only(top: 20)),
+      // 지금 뜨는 콘텐츠 부분
+      HomeBoxSlider(),
+   ],
+),
+```
+
+4. 리스트뷰의 항목 하나를 구성하기 위한 함수를 호출한다.
+```dart
+// 리스트뷰의 항목 하나를 구성하는 함수
+Widget makeListItem(){
+   return Container(
+      padding: EdgeInsets.only(right: 10),
+      child: Image.asset('lib/assets/images/movie2.jpg'),
+   );
+}
+```
+
+5. 리스트뷰를 구성해준다.
+```dart
+   @override
+   Widget build(BuildContext context) {
+      return Container(
+         padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+         child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+               Text("지금 뜨는 콘텐츠"),
+               Container(
+                  height: 120,
+                  child: ListView.builder(
+                     scrollDirection: Axis.horizontal,
+                     itemCount: 10,
+                     itemBuilder: (context, index) {
+                        return makeListItem();
+                     },
+                  ),
+               )
+            ],
+         ),
+      );
+   } 
+```
+
+### 영화 정보 보기 화면 구성
+- 영화 정보를 상세하게 볼 수 있는 화면을 구성한다.
+- 이 화면은 다음 동작에서 보여진다.
+- HomeScreen에서 정보 버튼을 눌렀을 때
+- HomeScreen에서 미리보기의 영화 포스터를 눌렀을 때
+- HomeScreen에서 지금 뜨는 콘텐츠에서 영화 포스터를 눌렀을 때
+- Search에서 검색된 결과에서 영화를 선택했을 때
+- Saved에서 저장한 영화 목록에서 영화를 선택했을 때
+
+1. screen/detail_screen.dart 파일을 만들어준다.
+
+2. StatefulWidget 기본 코드를 작성한다.
+```dart
+import 'package:flutter/material.dart';
+
+class DetailScreen extends StatefulWidget {
+   const DetailScreen({super.key});
+
+   @override
+   State<DetailScreen> createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return const Placeholder();
+   }
+} 
+```
+
+3. home_carousel_slider의 정보 버튼을 눌렀을 때
+```dart
+              // 정보
+Column(
+   children: [
+      IconButton(
+         onPressed: () {
+            // DetailScreen을 띄워준다.
+            Navigator.of(context).push(
+               MaterialPageRoute(
+                  // 보여질 다음 화면을 설정한다.
+                  builder: (context) => DetailScreen(),
+                  // 다이얼로그로 보여지게 한다.
+                  fullscreenDialog: true
+               )
+            );
+         },
+         icon: Icon(Icons.info)
+      ),
+      Text("정보", style: TextStyle(fontSize: 11))
+   ],
+),
+```
+
+4. DetailScreen을 구성해준다.
+```dart
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+
+class DetailScreen extends StatefulWidget {
+   const DetailScreen({super.key});
+
+   @override
+   State<DetailScreen> createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return Scaffold(
+         body: ListView(
+            children: [
+               Stack(
+                  children: [
+                     Container(
+                        // 배경 이미지를 깔아준다.
+                        width: double.maxFinite,
+                        decoration: BoxDecoration(
+                           image: DecorationImage(
+                              image: AssetImage('lib/assets/images/movie3.jpg'),
+                              fit: BoxFit.cover,
+                           ),
+                        ),
+                        child: Container(
+                           // 기존에 그려진 영역을 필터를 적용해 다시 그리고
+                           // child를 보여주는 컨테이너
+                           child: BackdropFilter(
+                              // 블러(흐림)처리 필터를 설정해준다.
+                              // sigmaX : 가로 방향 블러 값
+                              // sigmaY : 세로 방향 블러 값
+                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                              child: Container(
+                                 // 가운데에 배치한다.
+                                 alignment: Alignment.center,
+                                 // 배경을 좀 더 어둡게 해주기 위해 배경색을 검정색으로, 투명도를 10% 정도로 설정한다.
+                                 color: Colors.black.withOpacity(0.1),
+                                 child: Container(
+                                    child: Column(
+                                       children: [
+                                          // 포스터 이미지
+                                          Container(
+                                             padding: EdgeInsets.fromLTRB(0, 45, 0, 10),
+                                             child: Image.asset('lib/assets/images/movie3.jpg'),
+                                             height: 300,
+                                          ),
+                                          // 설명
+                                          Container(
+                                             padding: EdgeInsets.all(7),
+                                             child: Text(
+                                                "2019년 15+ 시즌 1개",
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(fontSize: 13),
+                                             ),
+                                          ),
+                                          // 영화 제목
+                                          Container(
+                                             padding: EdgeInsets.all(7),
+                                             child: Text(
+                                                '영화 제목',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(fontSize: 16),
+                                             ),
+                                          ),
+                                          // 재생 버튼
+                                          Container(
+                                             padding: EdgeInsets.all(10),
+                                             child: TextButton(
+                                                onPressed: () {
+
+                                                },
+                                                child: Row(
+                                                   mainAxisAlignment: MainAxisAlignment.center,
+                                                   children: [
+                                                      Icon(
+                                                         Icons.play_arrow,
+                                                         color: Colors.white,
+                                                      ),
+                                                      Padding(padding: EdgeInsets.all(3)),
+                                                      Text(
+                                                              "재생",
+                                                              style: TextStyle(color: Colors.white)
+                                                      ),
+                                                   ],
+                                                ),
+                                                style: ButtonStyle(
+                                                        backgroundColor: MaterialStatePropertyAll(Colors.red),
+                                                        shape: MaterialStatePropertyAll(
+                                                                RoundedRectangleBorder(
+                                                                        borderRadius: BorderRadius.all(Radius.circular(5.0))
+                                                                )
+                                                        )
+                                                ),
+                                             ),
+                                          ),
+                                          // 영화 설명
+                                          Container(
+                                             padding: EdgeInsets.all(5),
+                                             child: Text("동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세"),
+                                          ),
+                                          // 출연진
+                                          Container(
+                                             padding: EdgeInsets.all(5),
+                                             alignment: Alignment.centerLeft,
+                                             child: Text(
+                                                '출연 : 배우1, 배우2, 배우3, 배우4',
+                                                style: TextStyle(
+                                                        color: Colors.white60,
+                                                        fontSize: 12
+                                                ),
+                                             ),
+                                          ),
+                                          // 제작진
+                                          Container(
+                                             padding: EdgeInsets.all(5),
+                                             alignment: Alignment.centerLeft,
+                                             child: Text(
+                                                '제작진 : 제작1, 제작2',
+                                                style: TextStyle(
+                                                        color: Colors.white60,
+                                                        fontSize: 12
+                                                ),
+                                             ),
+                                          ),
+                                       ],
+                                    ),
+                                 ),
+                              ),
+                           ),
+                        ),
+                     ),
+                     // 좌측 상단(기본값)에 닫기 버튼을 배치한다.
+                     Positioned(
+                             child: AppBar(
+                                // 배경색을 투명색으로 지정한다.
+                                backgroundColor: Colors.transparent,
+                             )
+                     ),
+                  ],
+               ),
+               // 버튼들
+               Container(
+                  color: Colors.black26,
+                  child: Row(
+                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                     children: [
+                        // 찜 버튼
+                        Container(
+                           padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                           child: Container(
+                              child: Column(
+                                 children: [
+                                    Icon(Icons.add),
+                                    Padding(padding: EdgeInsets.all(5)),
+                                    Text(
+                                       textAlign: TextAlign.center,
+                                       "내가 찜한 콘텐츠",
+                                       style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.white60,
+                                       ),
+                                    )
+                                 ],
+                              ),
+                           ),
+                           width: 120,
+                        ),
+                        // 평가
+                        Container(
+                           padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                           child: Container(
+                              child: Column(
+                                 children: [
+                                    Icon(Icons.thumb_up),
+                                    Padding(padding: EdgeInsets.all(5)),
+                                    Text(
+                                       '평가',
+                                       style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.white60,
+                                       ),
+                                    )
+                                 ],
+                              ),
+                           ),
+                           width: 120,
+                        ),
+                        // 공유
+                        Container(
+                           padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                           child: Container(
+                              child: Column(
+                                 children: [
+                                    Icon(Icons.send),
+                                    Padding(padding: EdgeInsets.all(5)),
+                                    Text(
+                                       '공유',
+                                       style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.white60,
+                                       ),
+                                    )
+                                 ],
+                              ),
+                           ),
+                           width: 120,
+                        ),
+                     ],
+                  ),
+               ),
+            ],
+         ),
+      );
+   }
+}
+
+```
+
+5. HomeCircleSlider의 makeListItem을 수정한다.
+```dart
+itemBuilder: (context, index) {
+  return makeListItem(context);
+},
+
+// ListView의 항목 하나를 구성하여 반환하는 함수
+Widget makeListItem(BuildContext context){
+  // InkWell : 사용자 이벤트를 처리할 수 있는 컨테이너
+  // 화면 요소에 사용자 이벤트에 관련된 리스너가 없을 경우 사용한다.
+  return InkWell(
+    // 눌렀을 때의 리스너
+    onTap: () {
+      // DetailScreen을 띄운다.
+      Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => DetailScreen(),
+              fullscreenDialog: true
+          )
+      );
+    },
+    child: Container(
+      padding: EdgeInsets.only(right: 10),
+      // 동그라미 형태로 보여주는 컨테이너
+      child: CircleAvatar(
+        // 배경 이미지
+        backgroundImage: AssetImage("lib/assets/images/movie1.jpg"),
+        // 크기
+        radius: 48,
+      ),
+    ),
+  );
+}
+```
+
+6. HomeBoxSlider를 수정한다.
+```dart
+itemBuilder: (context, index) {
+  return makeListItem(context);
+},
+
+// 리스트뷰의 항목 하나를 구성하는 함수
+Widget makeListItem(BuildContext context){
+   return InkWell(
+      // 눌렀을 때의 리스너
+      onTap: () {
+         // DetailScreen을 띄운다.
+         Navigator.of(context).push(
+                 MaterialPageRoute(
+                         builder: (context) => DetailScreen(),
+                         fullscreenDialog: true
+                 )
+         );
+      },
+      child: Container(
+         padding: EdgeInsets.only(right: 10),
+         child: Image.asset('lib/assets/images/movie2.jpg'),
+      ),
+   );
+}
+```
+
+### 검색 화면 구성
+- 상단에 검색창을 배치한다.
+- 그 다음에는 검색결과가 나오는 리스트 뷰를 배치한다.
+
+1. screen/search_screen.dart 파일을 만들어준다.
+
+2. StatefulWidget 기본 코드를 작성해준다.
+```dart
+import 'package:flutter/material.dart';
+
+class SearchScreen extends StatefulWidget {
+   const SearchScreen({super.key});
+
+   @override
+   State<SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return const Placeholder();
+   }
+}
+```
+
+3. MainScreen의 두 번째 탭 화면을 변경한다.
+```dart
+      return Container(
+         child: [
+            HomeScreen(),
+            SearchScreen(),
+            Center(child: Text("Saved")),
+            Center(child: Text("More")),
+         ][currentPageIndex],
+      );
+```
+
+4. SearchScreen을 Scaffold 구조로 작성해준다.
+```dart
+class _SearchScreenState extends State<SearchScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return Scaffold(
+
+      );
+   }
+}
+```
+
+5. 상단 앱바 구성을 위해 widget/search_top_app_bar.dart 파일을 만든다.
+```dart
+import 'package:flutter/material.dart';
+
+class SearchTopAppBar extends StatefulWidget implements PreferredSizeWidget {
+   const SearchTopAppBar({super.key});
+
+   @override
+   State<SearchTopAppBar> createState() => _SearchTopAppBarState();
+
+   @override
+   Size get preferredSize => Size.fromHeight(kToolbarHeight);
+}
+
+class _SearchTopAppBarState extends State<SearchTopAppBar> {
+   @override
+   Widget build(BuildContext context) {
+      return const Placeholder();
+   }
+}
+
+```
+
+6. AppBar를 구성해준다.
+```dart
+      return AppBar(
+         title: Row(
+            children: [
+               Image.asset(
+                  'lib/assets/images/youtube_logo.png',
+                  fit: BoxFit.contain,
+                  height: 25,
+               ),
+               Padding(padding: EdgeInsets.only(right: 10)),
+               Text("LionFlix"),
+            ],
+         ),
+      );
+```
+
+7. SearchScreen에 AppBar를 배치한다.
+```dart
+   return Scaffold(
+    appBar: SearchTopAppBar(),
+
+   );
+```
+
+8. body 구조를 잡아준다.
+```dart
+   return Scaffold(
+      appBar: SearchTopAppBar(),
+      body: Container(
+         padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+         child: Column(
+            children: [
+            
+            ],
+         ),
+      ),
+   );
+```
+
+9. 검색을 위한 SearchBar 구성을 위해 widget/search_search_bar 파일을 만든다.
+```dart
+import 'package:flutter/material.dart';
+
+class SearchSearchBar extends StatefulWidget {
+   const SearchSearchBar({super.key});
+
+   @override
+   State<SearchSearchBar> createState() => _SearchSearchBarState();
+}
+
+class _SearchSearchBarState extends State<SearchSearchBar> {
+   @override
+   Widget build(BuildContext context) {
+      return const Placeholder();
+   }
+}
+```
+
+10. SearchBar를 구성해준다.
+```dart
+   Widget build(BuildContext context) {
+      return SearchBar(
+         // 좌측에 배치되는 아이콘
+         leading: Icon(Icons.search),
+         // 내부 여백
+         padding: MaterialStatePropertyAll(EdgeInsets.fromLTRB(10, 0, 10, 0)),
+      );
+   }
+```
+
+11. SearchBar를 배치한다.
+```dart
+class _SearchScreenState extends State<SearchScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return Scaffold(
+         appBar: SearchTopAppBar(),
+         body: Container(
+            padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+            child: Column(
+               children: [
+                  // 검색바
+                  SearchSearchBar(),
+               ],
+            ),
+         ),
+      );
+   }
+}
+
+```
+
+12. 리스트 구성을 위해 widget/search_list_view.dart 파일을 만들어준다.
+```dart
+import 'package:flutter/material.dart';
+
+class SearchListView extends StatefulWidget {
+   const SearchListView({super.key});
+
+   @override
+   State<SearchListView> createState() => _SearchListViewState();
+}
+
+class _SearchListViewState extends State<SearchListView> {
+   @override
+   Widget build(BuildContext context) {
+      return const Placeholder();
+   }
+}
+```
+
+13. 항목 하나를 구성하는 함수를 작성해준다.
+```dart
+// 리스트뷰의 항목 하나를 구성하는 함수
+// 리스트뷰의 항목은 ListTitle을 사용해도 된다 대신 아이콘 사이즈 조절 불가
+Widget makeListItem(BuildContext context){
+   return Container(
+      padding: EdgeInsets.only(top: 10),
+      child: InkWell(
+         onTap: () {
+            MaterialPageRoute(
+                    builder: (context) => DetailScreen(),
+                    fullscreenDialog: true
+            )
+         },
+         child: Row(
+            children: [
+               Image.asset(
+                  'lib/assets/images/movie4.jpg',
+                  width: 100,
+               ),
+               Padding(padding: EdgeInsets.only(right: 10)),
+               Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                     Text(
+                             '영화제목',
+                             style: TextStyle(fontSize: 15)
+                     ),
+                     Text(
+                             '출연진 : 배우1, 배우2, 배우3',
+                             style: TextStyle(fontSize: 12)
+                     ),
+                     Text(
+                             '제작진 : 제작1, 제작2, 제작3',
+                             style: TextStyle(fontSize: 12)
+                     ),
+                  ],
+               )
+            ],
+         ),
+      ),
+   );
+}
+
+// ListTitle 사용 예
+//
+Widget makeListItem2(){
+   return ListTile(
+      leading: Image.asset('lib/assets/images/movie6.jpg'),
+      title: Text('영화 제목'),
+      subtitle: Text('출연진 : 배우1, 배우2, 배우3\n제작진 : 제작1, 제작2, 제작3'),
+      isThreeLine: true,
+      onTap: () {},
+   );
+} 
+```
+
+14. ListView를 구성해준다.
+```dart
+class _SearchListViewState extends State<SearchListView> {
+   @override
+   Widget build(BuildContext context) {
+      return ListView.builder(
+         itemCount: 10,
+         itemBuilder: (context, index) => makeListItem(context),
+         // itemBuilder: (context, index) => makeListItem2(),
+      );
+   }
+} 
+```
+
+15. SearchScreen에 ListView를 배치해준다.
+```dart
+      child: Column(
+         children: [
+            // 검색바
+            SearchSearchBar(),
+            Padding(padding: EdgeInsets.only(top: 10)),
+            // 검색 결과가 나올 ListView
+            // Column이나 Row 등 사이즈를 정하지 못하는 컨테이너에
+            // 리스트뷰를 배치할 때는 Expanded 컨테이너를 사용해야 한다.
+            // Expanded는 컨테이너의 크기가 나중에(항목이 구성된 후)에 다시 조정되는 컨테이너이다.
+            Expanded(child: SearchListView()),
+         ],
+      ),
 ```
