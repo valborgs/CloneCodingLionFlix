@@ -1465,3 +1465,811 @@ class _SearchListViewState extends State<SearchListView> {
          ],
       ),
 ```
+
+## 2024-05-08
+
+### 저장한 컨텐츠 보기
+
+1. screen/like_screen.dart 파일을 만든다.
+
+```dart
+ import 'package:flutter/material.dart';
+
+class LikeScreen extends StatefulWidget {
+   const LikeScreen({super.key});
+
+   @override
+   State<LikeScreen> createState() => _LikeScreenState();
+}
+
+class _LikeScreenState extends State<LikeScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return const Placeholder();
+   }
+}
+```
+
+2. AppBar 작성을 위해 widget/like_top_app_bar.dart 파일을 만든다.
+
+```dart
+import 'package:flutter/material.dart';
+
+class LikeTopAppBar extends StatefulWidget implements PreferredSizeWidget {
+   const LikeTopAppBar({super.key});
+
+   @override
+   State<LikeTopAppBar> createState() => _LikeTopAppBarState();
+
+   @override
+   // TODO: implement preferredSize
+   Size get preferredSize => Size.fromHeight(kToolbarHeight);
+}
+
+class _LikeTopAppBarState extends State<LikeTopAppBar> {
+   @override
+   Widget build(BuildContext context) {
+      return AppBar(
+         title: Row(
+            children: [
+               Image.asset(
+                  'lib/assets/images/youtube_log.png',
+                  fit: BoxFit.contain,
+                  height: 25,
+               ),
+               Padding(padding: EdgeInsets.only(right: 10)),
+               Text('LionFlix'),
+            ],
+         ),
+      );
+   }
+}
+
+```
+
+3. AppBar를 배치한다.
+
+```dart
+class _LikeScreenState extends State<LikeScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return Scaffold(
+         appBar: LikeTopAppBar(),
+      );
+   }
+}
+
+```
+
+4. MainScreen에 LikeScreen을 배치한다.
+
+```dart
+      return Container(
+         child: [
+            HomeScreen(),
+            SearchScreen(),
+            LikeScreen(),
+            Center(child: Text("More")),
+         ][currentPageIndex],
+      );
+```
+
+5. ListView 구성을 위한 widget/like_list_view.dart 파일을 만든다.
+
+```dart
+import 'package:flutter/material.dart';
+
+class LikeListView extends StatefulWidget {
+   const LikeListView({super.key});
+
+   @override
+   State<LikeListView> createState() => _LikeListViewState();
+}
+
+class _LikeListViewState extends State<LikeListView> {
+   @override
+   Widget build(BuildContext context) {
+      return const Placeholder();
+   }
+} 
+```
+
+6. 항목 하나의 구조를 작성한다.
+
+```dart
+// 리스트 뷰의 항목 하나를 구성하는 함수
+Widget makeListItem(BuildContext context){
+   return Container(
+      padding: EdgeInsets.only(top: 10),
+      child: InkWell(
+         onTap: () {
+
+         },
+         child: Row(),
+      ),
+   );
+}
+```
+
+7. Row 내부 구조를 작성해준다.
+
+```dart
+   child: InkWell(
+      onTap: () {
+      
+      },
+      child: Row(
+         // 양쪽에 하나씩 배치되도록 한다.
+         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+         children: [
+            Row(),
+            IconButton(
+               onPressed: () {
+               
+               },
+               icon: Icon(Icons.delete)
+            ),
+         ],
+      ),
+   ),
+```
+
+8. 항목 좌측 부분을 구성해준다.
+
+```dart
+      Row(
+         children: [
+            Image.asset(
+               'lib/assets/images/movie7.jpg',
+               width: 100,
+            ),
+            Padding(padding: EdgeInsets.only(right: 10)),
+            Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: [
+                  Text('영화제목'),
+                  Text('출연진 : 배우1, 배우2, 배우3'),
+                  Text('제작진 : 제작1, 제작2, 제작3'),
+               ],
+            )
+         ],
+      ),
+```
+
+9. InkWell의 onTap을 구현한다.
+
+```dart
+   child: InkWell(
+      onTap: () {
+         Navigator.of(context).push(
+            MaterialPageRoute(
+               builder: (context) => DetailScreen(),
+               fullscreenDialog: true,
+            )
+         );
+      },
+```
+
+10. LikeScreen에 리스트뷰를 배치한다.
+
+```dart
+class _LikeScreenState extends State<LikeScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return Scaffold(
+         appBar: LikeTopAppBar(),
+         body: Container(
+            padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+            child: LikeListView(),
+         ),
+      );
+   }
+}
+
+```
+
+### more 화면
+
+1. screen/more_screen.dart 파일을 만들어준다.
+
+```dart
+import 'package:flutter/material.dart';
+
+class MoreScreen extends StatefulWidget {
+   const MoreScreen({super.key});
+
+   @override
+   State<MoreScreen> createState() => _MoreScreenState();
+}
+
+class _MoreScreenState extends State<MoreScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return const Placeholder();
+   }
+}
+
+```
+
+2. appbar 구성을 위한 widget/more_top_app_bar.dart 파일을 만들어준다.
+
+```dart
+import 'package:flutter/material.dart';
+
+class MoreTopAppBar extends StatefulWidget implements PreferredSizeWidget {
+   const MoreTopAppBar({super.key});
+
+   @override
+   State<MoreTopAppBar> createState() => _MoreTopAppBarState();
+
+   @override
+   // TODO: implement preferredSize
+   Size get preferredSize => Size.fromHeight(kToolbarHeight);
+}
+
+class _MoreTopAppBarState extends State<MoreTopAppBar> {
+   @override
+   Widget build(BuildContext context) {
+      return AppBar(
+         title: Row(
+            children: [
+               Image.asset(
+                  'lib/assets/images/youtube_logo.png',
+                  fit: BoxFit.contain,
+                  height: 25,
+               ),
+               Padding(padding: EdgeInsets.only(right: 10)),
+               Text('LionFlix'),
+            ],
+         ),
+      );
+   }
+}
+ 
+```
+
+3. AppBar를 배치한다.
+
+```dart
+class _MoreScreenState extends State<MoreScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return Scaffold(
+         appBar: MoreTopAppBar(),
+      );
+   }
+}
+```
+
+4. MainScreen에 MoreScreen을 배치해준다.
+
+```dart
+   return Container(
+      child: [
+         HomeScreen(),
+         SearchScreen(),
+         LikeScreen(),
+         MoreScreen(),
+      ][currentPageIndex],
+   ); 
+```
+
+5. ListView 구성을 위해 widget/more_list_view.dart 파일을 만들어준다.
+
+```dart
+import 'package:flutter/material.dart';
+
+class MoreListView extends StatefulWidget {
+   const MoreListView({super.key});
+
+   @override
+   State<MoreListView> createState() => _MoreListViewState();
+}
+
+class _MoreListViewState extends State<MoreListView> {
+   @override
+   Widget build(BuildContext context) {
+      return const Placeholder();
+   }
+}
+ 
+```
+
+6. ListView를 배치한다.
+
+```dart
+class _MoreScreenState extends State<MoreScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: MoreTopAppBar(),
+      body: Container(
+        padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+        child: MoreListView(),
+      ),
+    );
+  }
+}
+
+```
+
+7. ListView를 구성해준다.
+
+```dart
+class _MoreListViewState extends State<MoreListView> {
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        InkWell(
+          onTap: () {},
+          child: Text('마이 페이지', style: TextStyle(fontSize: 20)),
+        ),
+        Divider(),
+        InkWell(
+          onTap: () {},
+          child: Text('메뉴1', style: TextStyle(fontSize: 20)),
+        ),
+        Divider(),
+        InkWell(
+          onTap: () {},
+          child: Text('메뉴2', style: TextStyle(fontSize: 20)),
+        ),
+        Divider(),
+        InkWell(
+          onTap: () {},
+          child: Text('메뉴3', style: TextStyle(fontSize: 20)),
+        ),
+      ],
+    );
+  }
+}
+
+```
+
+### 마이 페이지
+
+1. 마이페이지를 위한 screen/my_page_screen.dart 파일을 만들어준다.
+
+```dart
+import 'package:flutter/material.dart';
+
+class MyPageScreen extends StatefulWidget {
+   const MyPageScreen({super.key});
+
+   @override
+   State<MyPageScreen> createState() => _MyPageScreenState();
+}
+
+class _MyPageScreenState extends State<MyPageScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return const Placeholder();
+   }
+} 
+```
+
+2. 화면 전환 효과를 슬라이드로 적용하여 화면을 바꿔준다.
+
+```dart
+        InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              // 화면 전환시 기본 애니메이션이 적용된다.
+              // 크로미움 기반 웹브라우저, 안드로이드 : pop animation
+              // iOS, ipadOS : slide animation
+
+              // 기본 애니메이션 대신 커스텀을 사용할 예정.
+              // MaterialPageRoute(
+              //   builder: (context) => MyPageScreen(),
+              // )
+
+              // 플러터에서 제공하는 애니메이션 클래스 사용
+              // https://docs.flutter.dev/ui/widgets/animation
+              PageRouteBuilder(
+                // 보여줄 화면 객체를 지정한다.
+                pageBuilder: (context, animation, secondaryAnimation) => MyPageScreen(),
+                // 화면 전환 애니메이션 구성
+                // animation : 기본 애니메이션 정보가 설정되어있는 객체
+                // child : 새롭게 나타나는 화면 객체, pageBuilder에서 반환한 화면 객체
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  // 새로 나타나는 화면 초기 위치(가로축 길이 비율, 세로축 길이 비율)
+                  var begin = Offset(1.0, 0.0);
+                  // 새로 나타나는 화면의 마지막 위치
+                  // var end = Offset(0.0, 0.0);
+                  var end = Offset.zero;
+                  // 위치 관리 객체
+                  var tween = Tween(begin: begin, end: end);
+                  // Curves
+                  // https://api.flutter.dev/flutter/animation/Curves-class.html
+                  var curve = Curves.ease;
+                  var curvedAnimation = CurvedAnimation(parent: animation, curve: curve);
+                  // 애니메이션 객체를 반환한다.
+                  return SlideTransition(
+                    position: tween.animate(curvedAnimation),
+                    child: child,
+                  );
+                },
+              )
+            );
+          },
+```
+
+3. widget/my_page_top_app_bar.dart 파일을 만든다.
+
+```dart
+import 'package:flutter/material.dart';
+
+class MyPageTopAppBar extends StatefulWidget implements PreferredSizeWidget {
+   const MyPageTopAppBar({super.key});
+
+   @override
+   State<MyPageTopAppBar> createState() => _MyPageTopAppBarState();
+
+   @override
+   // TODO: implement preferredSize
+   Size get preferredSize => Size.fromHeight(kToolbarHeight);
+}
+
+class _MyPageTopAppBarState extends State<MyPageTopAppBar> {
+   @override
+   Widget build(BuildContext context) {
+      return AppBar(
+         title: Row(
+            children: [
+               Image.asset(
+                  'lib/assets/images/youtube_logo.png',
+                  fit: BoxFit.contain,
+                  height: 25,
+               ),
+               Padding(padding: EdgeInsets.only(right: 10)),
+               Text('LionFlix'),
+            ],
+         ),
+      );
+   }
+}
+```
+
+4. MyPageScreen에 배치해준다.
+
+```dart
+class _MyPageScreenState extends State<MyPageScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return Scaffold(
+         appBar: MyPageTopAppBar(),
+      );
+   }
+}
+```
+
+5. body 기본 구조를 작성해준다.
+```dart
+   body: Container(
+      padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+      child: ListView(
+         children: [
+
+         ],
+      ),
+   ), 
+```
+
+6. 상단 프로필 사진을 배치해준다.
+```dart
+      child: ListView(
+         children: [
+            // 상단 프로필 이미지
+            Container(
+               height: 100,
+               child: Center(
+                child: Image.asset('lib/assets/images/youtube_logo.png'),
+               ),
+            )
+         ],
+      ), 
+```
+
+7. 카메라, 앨범 버튼을 배치한다.
+```dart
+            Padding(padding: EdgeInsets.only(top: 10)),
+            // 카메라, 앨범 버튼
+            Row(
+               mainAxisAlignment: MainAxisAlignment.center,
+               children: [
+                  IconButton(onPressed: () {}, icon: Icon(Icons.camera_alt)),
+                  IconButton(onPressed: () {}, icon: Icon(Icons.photo_album)),
+               ],
+            ),
+```
+
+8. 이름 입력 요소를 배치한다.
+
+```dart
+            Padding(padding: EdgeInsets.only(top: 10)),
+            // 이름 입력
+            TextField(
+               decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: '이름'
+               ),
+            ), 
+```
+
+9. 닉네임 입력 요소를 배치한다.
+
+```dart
+            Padding(padding: EdgeInsets.only(top: 10)),
+            // 이름 입력
+            TextField(
+               decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: '닉네임'
+               ),
+            ), 
+```
+
+10. 저장 버튼을 배치한다.
+```dart
+            // 버튼
+            TextButton(
+               onPressed: () {},
+               child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                     Icon(
+                        Icons.save_alt,
+                        color: Colors.white,
+                     ),
+                     Padding(padding: EdgeInsets.all(3)),
+                     Text('저장', style: TextStyle(color: Colors.white)),
+                  ]
+               ),
+               style: ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(Colors.red),
+                  shape: MaterialStatePropertyAll(
+                     RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0))
+                     )
+                  )
+               ),
+            ),
+```
+
+### 영화 드라마
+- 둘은 코드가 거의 똑같기 때문에 같이 정리한다.
+
+1. screen/movie_screen.dart, screen/drama_screen.dart 파일을 만든다.
+
+```dart
+import 'package:flutter/material.dart';
+
+class MovieScreen extends StatefulWidget {
+  const MovieScreen({super.key});
+
+  @override
+  State<MovieScreen> createState() => _MovieScreenState();
+}
+
+class _MovieScreenState extends State<MovieScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+```
+
+```dart
+import 'package:flutter/material.dart';
+
+class DramaScreen extends StatefulWidget {
+  const DramaScreen({super.key});
+
+  @override
+  State<DramaScreen> createState() => _DramaScreenState();
+}
+
+class _DramaScreenState extends State<DramaScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+```
+
+2. HomeScreen의 앱바 메뉴에 화면 전환 코드를 넣어준다.
+
+```dart
+      // 앱바 우측에 나타나는 메뉴들
+      actions: [
+        // tv 메뉴
+        IconButton(
+            onPressed: (){
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DramaScreen(),
+                ),
+              );
+            },
+            icon: Icon(Icons.tv)
+        ),
+        // 영화 메뉴
+        IconButton(
+            onPressed: (){
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MovieScreen(),
+                ),
+              );
+            },
+            icon: Icon(Icons.movie)
+        ),
+      ],
+```
+
+3. AppBar를 구성할 파일을 만들어준다.
+
+- widget/drama_top_app_bar.dart
+```dart
+import 'package:flutter/material.dart';
+
+class DramaTopAppBar extends StatefulWidget implements PreferredSizeWidget {
+   const DramaTopAppBar({super.key});
+
+   @override
+   State<DramaTopAppBar> createState() => _DramaTopAppBarState();
+
+   @override
+   // TODO: implement preferredSize
+   Size get preferredSize => Size.fromHeight(kToolbarHeight);
+}
+
+class _DramaTopAppBarState extends State<DramaTopAppBar> {
+   @override
+   Widget build(BuildContext context) {
+      return AppBar(
+         title: Row(
+            children: [
+               Image.asset(
+                  'lib/assets/images/youtube_logo.png',
+                  fit: BoxFit.contain,
+                  height: 25,
+               ),
+               Padding(padding: EdgeInsets.only(right: 10)),
+               Text('LionFlix'),
+            ],
+         ),
+      );
+   }
+} 
+```
+
+- widget/movie_top_app_bar.dart
+```dart
+import 'package:flutter/material.dart';
+
+class MovieTopAppBar extends StatefulWidget implements PreferredSizeWidget {
+   const MovieTopAppBar({super.key});
+
+   @override
+   State<MovieTopAppBar> createState() => _MovieTopAppBarState();
+
+   @override
+   // TODO: implement preferredSize
+   Size get preferredSize => Size.fromHeight(kToolbarHeight);
+}
+
+class _MovieTopAppBarState extends State<MovieTopAppBar> {
+   @override
+   Widget build(BuildContext context) {
+      return AppBar(
+         title: Row(
+            children: [
+               Image.asset(
+                  'lib/assets/images/youtube_logo.png',
+                  fit: BoxFit.contain,
+                  height: 25,
+               ),
+               Padding(padding: EdgeInsets.only(right: 10)),
+               Text('LionFlix'),
+            ],
+         ),
+      );
+   }
+}
+```
+
+4. AppBar를 배치해준다.
+
+```dart
+class _DramaScreenState extends State<DramaScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: DramaTopAppBar(),
+    );
+  }
+}
+```
+
+```dart
+class _MovieScreenState extends State<MovieScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return Scaffold(
+         appBar: MovieTopAppBar(),
+      );
+   }
+}
+```
+
+5. GridView의 항목 하나를 구성하는 함수를 만들어준다.
+
+```dart
+// 그리드 뷰의 항목 하나를 구성하는 함수
+Widget makeGridItem(BuildContext context){
+  return InkWell(
+    onTap: () {
+       Navigator.of(context).push(
+               MaterialPageRoute(
+                  builder: (context) => DetailScreen(),
+                  fullscreenDialog: true,
+               )
+       );
+    },
+    child: Image.asset('lib/assets/images/movie8.jpg'),
+  );
+}
+```
+
+6. GridView를 구성해준다.
+
+```dart
+class _DramaScreenState extends State<DramaScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: DramaTopAppBar(),
+      body: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            // 컬럼의 개수
+            crossAxisCount: 4,
+            // 수평 방향 여백
+            mainAxisSpacing: 10,
+            // 수직 방향 여백
+            crossAxisSpacing: 10,
+            // 항목의 가로 세로 비율
+            childAspectRatio: 0.7,
+          ),
+          itemBuilder: (context, index) => makeGridItem(context),
+      ),
+    );
+  }
+}
+```
+
+```dart
+class _MovieScreenState extends State<MovieScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: MovieTopAppBar(),
+      body: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          // 컬럼의 개수
+          crossAxisCount: 4,
+          // 수평 방향 여백
+          mainAxisSpacing: 10,
+          // 수직 방향 여백
+          crossAxisSpacing: 10,
+          // 항목의 가로 세로 비율
+          childAspectRatio: 0.7,
+        ),
+        itemBuilder: (context, index) => makeGridItem(context),
+      ),
+    );
+  }
+}
+```
