@@ -4,7 +4,13 @@ import 'package:flutter03_lionflix/screen/detail_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomeCarouselSlider extends StatefulWidget {
-  const HomeCarouselSlider({super.key});
+
+  // 영화 데이터를 담을 상태 변수
+  List<Map<String, dynamic>> movieData;
+  // 영화 포스터를 담을 상태 변수
+  List<Image> posterData;
+
+  HomeCarouselSlider(this.movieData, this.posterData, {super.key});
 
   @override
   State<HomeCarouselSlider> createState() => _HomeCarouselSliderState();
@@ -42,12 +48,18 @@ class _HomeCarouselSliderState extends State<HomeCarouselSlider> {
 
   @override
   Widget build(BuildContext context) {
+
+    // 영화 제목을 담아준다.
+    movieTitles.clear();
+    for(var map in widget.movieData){
+      movieTitles.add(map['movie_title']);
+    }
     return Container(
       child: Column(
         children: [
           // 회전목마
           CarouselSlider(
-              items: images,
+              items: widget.posterData,
               options: CarouselOptions(
                 // 회전목마가 이미지를 보여주는 영역안에서 얼만큼의 크기로 이미지를
                 // 보여줄지에 대한 비율. 1.0이 최대

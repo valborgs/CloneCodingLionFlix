@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter03_lionflix/screen/drama_screen.dart';
 import 'package:flutter03_lionflix/screen/movie_screen.dart';
@@ -59,7 +60,9 @@ class _HomeTopAppBarState extends State<HomeTopAppBar> {
         ),
         // 찜 메뉴
         IconButton(
-            onPressed: (){},
+            onPressed: () {
+              // printTest();
+            },
             icon: Icon(Icons.favorite)
         ),
       ],

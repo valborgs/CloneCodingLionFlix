@@ -2273,3 +2273,587 @@ class _MovieScreenState extends State<MovieScreen> {
   }
 }
 ```
+
+## 2024-05-09
+
+### 파이어베이스 연동 설정
+- Flutter Firebase 연동 작업을 모두 완료해준다.
+- 라이브러리를 추가한다(pubspec.yaml)
+- firebase_core
+- cloud_firestore
+- firebase_storage
+
+1. main.dart 파일에서 파이어베이스 초기화
+```dart
+Future<void> main() async {
+
+   // 파이어 베이스 사용 시 화면이 안나오는 문제 해결
+   // 파이어 베이스의 await(동기화) 때문에 Flutter VM이 화면 처리를 못하는 문제 발생
+   // 이를 위해 설정해준다.
+   WidgetsFlutterBinding.ensureInitialized();
+   // Firestore 초기 설정
+   await Firebase.initializeApp();
+
+   runApp(LionFlixApp());
+}
+```
+
+2. 위 작업 후 실행하면 오류가 발생한다.
+- 이 오류는 안드로이드의 프로젝트 설정때문에 발생하는 문제이다.
+- android/app/build.gradle
+- defaultConfig에 multiDexEnabled true를 넣어준다.
+
+```gradle
+    defaultConfig {
+        ...
+        multiDexEnabled true
+        ...
+    }
+```
+
+### 파이어베이스 연동 테스트
+```dart
+// 찜 메뉴
+IconButton(
+   onPressed: () => addTest,
+   icon: Icon(Icons.favorite)
+),
+
+// 테스트 데이터 저장
+Future<void> addTest() async {
+   await FirebaseFirestore.instance.collection('test').add({
+      'data1' : 100,
+      'data2' : 11.111,
+      'data3' : '안녕하세요'
+   });
+}
+
+// 테스트 데이터 출력
+Future<void> printTest() async {
+   var result = await FirebaseFirestore.instance.collection('test').get();
+   for(var doc in result.docs){
+      var map = doc.data();
+      print('firebase test : $map');
+   }
+}
+```
+
+### 파이어베이스에 기본 데이터 저장하기
+1. Storage에 poster라는 폴더를 만들어주고 이미지 파일을 업로드한다.
+
+2. main.dart에 데이터를 저장하는 함수를 넣어준다.
+```dart
+Future<void> addInitData() async {
+
+   // await FirebaseFirestore.instance.collection('test').doc('bbbb').set(
+   //   {
+   //     'data1' : 100,
+   //     'data2' : '하하하'
+   //   }
+   // );
+
+   await FirebaseFirestore.instance.collection('movie_data').add({
+      'movie_idx' : 1,
+      'movie_title' : '라라 랜드',
+      'movie_info' : '2016 12+',
+      'movie_type' : 1,
+      'movie_detail_info' : "꿈을 꾸는 사람들을 위한 별들의 도시 '라라랜드'. 재즈 피아니스트 '세바스찬'(라이언 고슬링)과 성공을 꿈꾸는 배우 지망생 '미아'(엠마 스톤). 인생에서 가장 빛나는 순간 만난 두 사람은 미완성인 서로의 무대를 만들어가기 시작한다.",
+      'movie_actor' : '라이언 고슬링, 엠마 스톤, 존 레전드 외',
+      'movie_director' : '데이미언 셔젤',
+      'movie_poster' : 'movie1.jpg'
+   });
+
+   await FirebaseFirestore.instance.collection('movie_data').add({
+      'movie_idx' : 2,
+      'movie_title' : '백두산',
+      'movie_info' : '2019 12+',
+      'movie_type' : 2,
+      'movie_detail_info' : "대한민국 관측 역사상 최대 규모의 백두산 폭발 발생. 갑작스러운 재난에 한반도는 순식간에 아비규환이 되고, 남과 북 모두를 집어삼킬 추가 폭발이 예측된다.",
+      'movie_actor' : '이병헌, 하정우, 마동석, 전혜진, 배수지 外',
+      'movie_director' : '이해준, 김병서',
+      'movie_poster' : 'movie2.jpg'
+   });
+
+   await FirebaseFirestore.instance.collection('movie_data').add({
+      'movie_idx' : 3,
+      'movie_title' : '1987',
+      'movie_info' : '2017 15+',
+      'movie_type' : 1,
+      'movie_detail_info' : "증거인멸을 위해 박 처장(김윤석)의 주도 하에 경찰은 시신 화장을 요청하지만, 사망 당일 당직이었던 최 검사(하정우)는 이를 거부하고 부검을 밀어붙인다.",
+      'movie_actor' : '김윤석, 하정우, 유해진, 김태리, 박희순, 이희준 외',
+      'movie_director' : '장준환',
+      'movie_poster' : 'movie3.jpg'
+   });
+
+   await FirebaseFirestore.instance.collection('movie_data').add({
+      'movie_idx' : 4,
+      'movie_title' : '기생충',
+      'movie_info' : '2020 15+',
+      'movie_type' : 2,
+      'movie_detail_info' : "전원백수로 살 길 막막하지만 사이는 좋은 기택(송강호) 가족.",
+      'movie_actor' : '송강호, 이선균, 조여정, 최우식, 박소담, 장혜진, 이정은 外',
+      'movie_director' : '봉준호',
+      'movie_poster' : 'movie4.jpg'
+   });
+
+   await FirebaseFirestore.instance.collection('movie_data').add({
+      'movie_idx' : 5,
+      'movie_title' : '부산행',
+      'movie_info' : '2016 15+',
+      'movie_type' : 1,
+      'movie_detail_info' : "정체불명의 바이러스가 전국으로 확산되고 대한민국 긴급재난경보령이 선포된 가운데,",
+      'movie_actor' : '공유, 정유미, 마동석, 최우식, 안소희, 김의성, 김수안 등',
+      'movie_director' : '연상호',
+      'movie_poster' : 'movie5.jpg'
+   });
+
+   await FirebaseFirestore.instance.collection('movie_data').add({
+      'movie_idx' : 6,
+      'movie_title' : '너의 이름은',
+      'movie_info' : '2017 12+',
+      'movie_type' : 2,
+      'movie_detail_info' : "한 달 후, 천 년 만에 찾아온다는 혜성을 기다리고 있는 일본.",
+      'movie_actor' : '카미키 류노스케, 카미시라이시 모네, 타니 카논, 이시카와 카이토, 나가사와 마사미, 나리타 료, 시마자키 노부나가, 유우키 아오이',
+      'movie_director' : '신카이 마코토',
+      'movie_poster' : 'movie6.jpg'
+   });
+
+   await FirebaseFirestore.instance.collection('movie_data').add({
+      'movie_idx' : 7,
+      'movie_title' : '어벤져스 : 엔드게임',
+      'movie_info' : '2019 12+',
+      'movie_type' : 1,
+      'movie_detail_info' : "인피니티 워 이후 절반만 살아남은 지구, 마지막 희망이 된 어벤져스. 먼저 떠난 그들을 위해 모든 것을 걸었다! 위대한 어벤져스, 운명을 바꿀 최후의 전쟁이 펼쳐진다!",
+      'movie_actor' : '로버트 다우니 주니어, 크리스 에반스, 마크 러팔로, 크리스 헴스워스, 스칼렛 요한슨, 제레미 레너, 돈 치들, 폴 러드, 브리 라슨, 카렌 길런, 다나이 구리라, 브래들리 쿠퍼, 조시 브롤린, 톰 홀랜드',
+      'movie_director' : '앤서니 루소, 조 루소',
+      'movie_poster' : 'movie7.jpg'
+   });
+
+   await FirebaseFirestore.instance.collection('movie_data').add({
+      'movie_idx' : 8,
+      'movie_title' : '파묘',
+      'movie_info' : '2024 15+',
+      'movie_type' : 2,
+      'movie_detail_info' : "미국 LA, 거액의 의뢰를 받은 무당 ‘화림’(김고은)과 ‘봉길’(이도현)은 기이한 병이 대물림되는 집안의 장손을 만난다.",
+      'movie_actor' : '최민식, 김고은, 유해진, 이도현',
+      'movie_director' : '장재현',
+      'movie_poster' : 'movie8.jpg'
+   });
+
+   await FirebaseFirestore.instance.collection('movie_data').add({
+      'movie_idx' : 9,
+      'movie_title' : '길복순',
+      'movie_info' : '2023 19+',
+      'movie_type' : 1,
+      'movie_detail_info' : "청부살인업계의 전설적인 킬러 길복순이 회사와 재계약 직전, 죽거나 또는 죽이거나, 피할 수 없는 대결에 휘말리게 되는 이야기를 그린 액션 영화",
+      'movie_actor' : '전도연, 설경구, 김시아, 이솜, 구교환 外',
+      'movie_director' : '변성현',
+      'movie_poster' : 'movie9.jpg'
+   });
+
+   await FirebaseFirestore.instance.collection('movie_data').add({
+      'movie_idx' : 10,
+      'movie_title' : '대부',
+      'movie_info' : '1977 19+',
+      'movie_type' : 2,
+      'movie_detail_info' : "1945년, 비토 코를레오네의 딸 코니 코를레오네와 카를로 리치의 결혼식이 진행되고 있다.",
+      'movie_actor' : '말런 브랜도, 알 파치노 外',
+      'movie_director' : '프랜시스 포드 코폴라',
+      'movie_poster' : 'movie10.jpg'
+   });
+
+   await FirebaseFirestore.instance.collection('hot').add({
+      'hot_movie_idx' : [1, 3]
+   });
+
+   await FirebaseFirestore.instance.collection('like').add({
+      'like_movie_index' : []
+   });
+}
+```
+
+3. firestore에 테스트용으로 저장되어 있는 컬렉션은 모두 삭제한다.
+
+4. main 함수에서 호출해준다.
+```dart
+Future<void> main() async {
+
+   // 파이어 베이스 사용 시 화면이 안나오는 문제 해결
+   // 파이어 베이스의 await(동기화) 때문에 Flutter VM이 화면 처리를 못하는 문제 발생
+   // 이를 위해 설정해준다.
+   WidgetsFlutterBinding.ensureInitialized();
+   // Firestore 초기 설정
+   await Firebase.initializeApp();
+
+   // 초기 데이터 저장
+   addInitData();
+
+   runApp(LionFlixApp());
+}
+```
+
+5. 실행 후 firestore에서 데이터가 저장되었는지 확인해준다.
+
+6. addInitData() 호출 부분은 주석 처리해준다.
+
+### HomeScreen 작업
+
+1. lib 폴더에 dao 폴더를 생성해준다.
+
+2. dao 폴더에 movie_dao.dart 파일을 만들어준다.
+
+3. 영화 정보 전체를 가져오는 함수를 작성한다.
+```dart
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+// 영화 데이터 전체를 가져오는 함수
+Future<List<Map<String, dynamic>>> getMovieData() async {
+   // movie_data 컬렉션에 저장되어 있는 모든 문서를 가져온다.
+   var querySnapShot = await FirebaseFirestore.instance.collection('movie_data').get();
+
+   // 데이터를 담을 리스트
+   List<Map<String, dynamic>> results = [];
+
+   // 데이터를 리스트에 담아준다.
+   // 컬렉션에 담긴 모든 문서를 가져와 반복한다.
+   for(var doc in querySnapShot.docs){
+      // 문서에 담긴 데이터를 맵으로 추출하여 리스트에 담는다.
+      results.add(doc.data());
+   }
+
+   return results;
+}
+```
+
+4. 데이터를 가져오는 메서드를 만들어준다.
+```dart
+// 영화 데이터를 가져오는 메서드
+// getMovieData를 initState에서 직접 호출하려면 async가 붙기 때문에
+// initState를 async로 바꾸면 오류가 난다.
+// 따라서 별도의 async 함수를 만들어 감싼 후 해당 함수를
+// initState에서 호출하는 방식으로 사용한다.
+Future<void> getData() async {
+   // 영화 데이터를 가져온다.
+   var tempMovieData = await getMovieData();
+   print('home screen - $tempMovieData');
+}
+```
+
+5. initState에서 호출해준다.
+```dart
+// 화면이 보여질 때마다 호출되는 함수
+// 안드로이드의 onResume과 같은 역할
+@override
+void initState() {
+   // TODO: implement initState
+   super.initState();
+
+   // 데이터를 가져오는 메서드를 호출해준다.
+   getData();
+}
+```
+
+6. 이미지를 가져오는 메서드를 만들어준다.
+```dart
+import 'package:flutter/material.dart';
+
+// 이미지 데이터를 가져온다.
+Future<Image> getImageData(String fileName) async {
+   // 이미지를 가져올 수 있는 주소를 가져온다.
+   String imageUrl = await FirebaseStorage.instance.ref('poster/$fileName').getDownloadURL();
+   // print(imageUrl);
+
+   // 이미지를 관리하는 객체
+   Image resultImage = Image.network(imageUrl);
+
+   return resultImage;
+}
+```
+
+7. 영화 데이터와 이미지 데이터를 담을 상태 변수를 만들어준다.
+```dart
+// 영화 데이터를 담을 상태 변수
+List<Map<String, dynamic>> movieData = [];
+// 영화 포스터를 담을 상태 변수
+List<Image> posterData = [];
+```
+
+8. 영화의 수 만큼 임시 포스터 객체를 만들어 담아준다.
+```dart
+   // 영화의 수 만큼 이미지 객체를 만들어준다.
+   posterData = List<Image>.generate(
+      // 리스트가 담을 객체의 개수
+      tempMovieData.length,
+      // 리스트가 담을 객체를 생성해 반환해준다.
+      (index) => Image.asset('lib/assets/images/loading.gif'),
+   );
+```
+
+9. 영화 정보 상태를 설정한다.
+```dart
+   // 영화 데이터를 통해 상태를 설정한다.
+   setState(() {
+    movieData = tempMovieData;
+   }); 
+```
+10. 포스터 데이터를 받아오며 상태를 설정해준다.
+
+```dart
+    // 포스터 데이터를 받아오며 상태를 설정해준다.
+    for(int i=0; i<tempMovieData.length; i++){
+      // i번째 영화 포스터 객체를 가져온다.
+      var tempImage = await getImageData(tempMovieData[i]['movie_poster']);
+      // 받아온 이미지 객체를 포스터를 담을 리스트에 담아주고 상태를 설정한다.
+      setState(() {
+        posterData[i] = tempImage;
+      });
+    }
+```
+
+9. HomeCarouselSlider 객체의 생성자로 영화 데이터와 포스터 데이터를 전달해준다.
+```dart
+  @override
+Widget build(BuildContext context) {
+   return Scaffold(
+      appBar: HomeTopAppBar(),
+      body: ListView(
+         children: [
+            // 상단 회전 목마
+            HomeCarouselSlider(movieData, posterData),
+```
+
+10. HomeCarouselSlider 객체에 담을 변수와 생성자를 수정한다.
+```dart
+class HomeCarouselSlider extends StatefulWidget {
+
+   // 영화 데이터를 담을 상태 변수
+   List<Map<String, dynamic>> movieData = [];
+   // 영화 포스터를 담을 상태 변수
+   List<Image> posterData = [];
+
+   HomeCarouselSlider(this.movieData, this.posterData, {super.key}); 
+```
+
+11. 전달받은 포스터 데이터를 설정한다.
+```dart
+
+@override
+Widget build(BuildContext context) {
+   return Container(
+      child: Column(
+      children: [
+        // 회전목마
+        CarouselSlider(
+          items: widget.posterData,
+```
+
+12. hoe_carousel_slider에서 영화 제목을 리스트에 담아준다.
+```dart
+  @override
+Widget build(BuildContext context) {
+
+   // 영화 제목을 담아준다.
+   movieTitles.clear();
+   for(var map in widget.movieData){
+      movieTitles.add(map['movie_title']);
+   }
+```
+
+13. 영화 정보와 포스터 정보를 HomeCircleSlider에 전달해준다.
+```dart
+            // 미리 보기 부분
+            HomeCircleSlider(movieData, posterData),
+```
+
+14. 데이터를 담을 변수를 정의해주고 생성자를 수정한다.
+```dart
+class HomeCircleSlider extends StatefulWidget {
+
+   // 영화 데이터를 담을 상태 변수
+   List<Map<String, dynamic>> movieData = [];
+   // 영화 포스터를 담을 상태 변수
+   List<Image> posterData = [];
+
+   HomeCircleSlider(this.movieData, this.posterData, {super.key}); 
+```
+
+15. 리스트 뷰의 항목 하나를 구성하는 함수의 매개변수를 수정한다.
+```dart
+// ListView의 항목 하나를 구성하여 반환하는 함수
+Widget makeListItem(
+   BuildContext context,
+   List<Map<String, dynamic>> movieData,
+   List<Image> posterData,
+   int index
+)
+```
+
+16. 이미지 데이터를 설정하는 곳을 수정해준다.
+```dart
+         child: CircleAvatar(
+            // 배경 이미지
+            backgroundImage: posterData[index].image,
+            // 크기
+            radius: 48,
+         ),
+```
+
+17. makeListItem 함수를 호출할 때 영화 데이터, 포스터 데이터, 항목의 순서값을 전달해준다.
+```dart
+            // 항목 하나를 구성하기 위해 호출하는 함수
+            // 여기서 반환하는 위젯이 항목 하나가 된다.
+            itemBuilder: (context, index) {
+               return makeListItem(
+                  context,
+                  widget.movieData,
+                  widget.posterData,
+                  index
+               );
+            },
+```
+
+18. movie_dao에서 지금 뜨는 콘텐츠 정보를 가져오는 메서드를 작성한다.
+```dart
+// 지금 뜨는 콘텐츠 정보를 가져온다.
+Future<List<int>> getHotMovieList() async {
+   var querySnapshot = await FirebaseFirestore.instance.collection('hot').get();
+
+   List<int> results = List<int>.from(querySnapshot.docs[0].data()['hot_movie_idx']);
+
+   return results;
+}
+```
+
+19. 지금 뜨는 콘텐츠 정보를 담을 리스트를 정의해준다.
+```dart
+class _HomeScreenState extends State<HomeScreen> {
+
+   // 영화 데이터를 담을 상태 변수
+   List<Map<String, dynamic>> movieData = [];
+   // 영화 포스터를 담을 상태 변수
+   List<Image> posterData = [];
+   // 지금 뜨는 콘텐츠 정보를 담을 리스트
+   List<int> hotMovie = [];
+```
+
+20. 지금 뜨는 콘텐츠 정보를 받아와 담아준다.
+```dart
+  Future<void> getData() async {
+   ...
+   // 지금 뜨는 콘텐츠 정보를 받아온다.
+   hotMovie = await getHotMovieList();
+   ...
+  }
+```
+
+21. HomeBoxSlider 객체에 필요한 데이터를 전달해준다.
+```dart
+   body: ListView(
+      children: [
+         // 상단 회전 목마
+         HomeCarouselSlider(movieData, posterData),
+         Padding(padding: EdgeInsets.only(top: 20)),
+         // 미리 보기 부분
+         HomeCircleSlider(movieData, posterData),
+         Padding(padding: EdgeInsets.only(top: 20)),
+         // 지금 뜨는 콘텐츠 부분
+         HomeBoxSlider(movieData, posterData, hotMovie),
+      ],
+   ),
+```
+
+22. HomeBoxSlider에 데이터를 담을 변수를 선언해주고 생성자를 통해 받아준다.
+```dart
+class HomeBoxSlider extends StatefulWidget {
+
+   // 영화 데이터를 담을 상태 변수
+   List<Map<String, dynamic>> movieData = [];
+   // 영화 포스터를 담을 상태 변수
+   List<Image> posterData = [];
+   // 지금 뜨는 콘텐츠 정보를 담을 리스트
+   List<int> hotMovie = [];
+
+   HomeBoxSlider(this.movieData, this.posterData, this.hotMovie, {super.key});
+```
+
+23. 영화 데이터 중에 지금 뜨는 콘텐츠에 해당하는 것만 리스트에 담아준다.
+```dart
+class _HomeBoxSliderState extends State<HomeBoxSlider> {
+
+   @override
+   Widget build(BuildContext context) {
+
+      // 지금 뜨는 컨텐츠 정보 객체만 담는다.
+      List<Map<String, dynamic>> hotMovieData = [];
+      // 지금 뜨는 컨텐츠의 영화 포스터를 담을 리스트
+      List<Image> hotMoviePoster = [];
+
+      // 영화의 수 만큼 반복한다.
+      for(int i=0; i<widget.movieData.length; i++){
+         // 현재 영화의 번호가 지금 뜨는 컨텐츠 번호에 있다면 리스트에 담아준다.
+         if(widget.hotMovie.contains(widget.movieData[i]['movie_idx'])){
+            hotMovieData.add(widget.movieData[i]);
+            hotMoviePoster.add(widget.posterData[i]);
+         }
+      }
+```
+
+24. makeListItem 함수의 매개 변수를 수정해준다.
+```dart
+// 리스트뷰의 항목 하나를 구성하는 함수
+Widget makeListItem(
+        BuildContext context,
+        List<Map<String, dynamic>> hotMovieData,
+        List<Image> hotMoviePoster,
+        int index
+        ){
+```
+
+25. 항목을 통해 보여줄 이미지를 설정한다.
+```dart
+      child: Container(
+         padding: EdgeInsets.only(right: 10),
+         child: hotMoviePoster[index],
+      ),
+```
+
+26. makeListItem 함수를 호출하는 부분을 수정해준다.
+```dart
+         itemBuilder: (context, index) {
+            return makeListItem(
+               context,
+               hotMovieData,
+               hotMoviePoster,
+               index
+            );
+         },
+```
+
+27. 데이터가 없을 때를 대비하여 화면을 변경해준다.
+```dart
+  @override
+Widget build(BuildContext context) {
+
+   if(movieData.isEmpty){
+      return Scaffold(
+         appBar: HomeTopAppBar(),
+      );
+   }else{
+      return Scaffold(
+         appBar: HomeTopAppBar(),
+         body: ListView(
+            children: [
+               // 상단 회전 목마
+               HomeCarouselSlider(movieData, posterData),
+               Padding(padding: EdgeInsets.only(top: 20)),
+               // 미리 보기 부분
+               HomeCircleSlider(movieData, posterData),
+               Padding(padding: EdgeInsets.only(top: 20)),
+               // 지금 뜨는 콘텐츠 부분
+               HomeBoxSlider(movieData, posterData, hotMovie),
+            ],
+         ),
+      );
+   }
+}
+```

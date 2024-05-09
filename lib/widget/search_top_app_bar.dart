@@ -14,6 +14,7 @@ class _SearchTopAppBarState extends State<SearchTopAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      scrolledUnderElevation: 0,
       title: Row(
         children: [
           Image.asset(
