@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter03_lionflix/widget/search_list_view.dart';
 import 'package:flutter03_lionflix/widget/search_search_bar.dart';
@@ -12,13 +11,15 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      appBar: SearchTopAppBar(),
+      appBar: const SearchTopAppBar(),
       body: Container(
-        padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-        child: Column(
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        child: const Column(
           children: [
             // 검색바
             SearchSearchBar(),

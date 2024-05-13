@@ -2857,3 +2857,455 @@ Widget build(BuildContext context) {
    }
 }
 ```
+## 2024-05-13
+### 검색 기능 구현
+
+1. 서치바에 이벤트 처리를 넣어준다.
+```dart
+   return SearchBar(
+      // 좌측에 배치되는 아이콘
+      leading: Icon(Icons.search),
+      // 내부 여백
+      padding: MaterialStatePropertyAll(EdgeInsets.fromLTRB(10, 0, 10, 0)),
+      // 키보드의 submit 버튼을 눌렀을 때
+      // value : 사용자가 입력한 내용이 들어온다.
+      onSubmitted: (value) {
+      
+      },
+   );
+```
+
+2. TabPageIndexProvider에 검색어를 담을 변수를 선언해준다.
+```dart
+class TabPageIndexProvider extends ChangeNotifier{
+
+   // 사용자가 입력한 검색어를 담을 변수
+   String _searchKeyword = "";
+
+   String get searchKeyword => _searchKeyword;
+
+}
+```
+
+3. 키워드를 변수에 담는 메서드를 만들어준다.
+- notifyListeners()를 호출하여 연결된 모든 리스너를 동작시킨다.
+```dart
+class TabPageIndexProvider extends ChangeNotifier{
+
+   // 사용자가 입력한 검색어를 담을 변수
+   String _searchKeyword = "";
+
+   String get searchKeyword => _searchKeyword;
+
+   void setKeyword(String keyword){
+      _searchKeyword = keyword;
+      // 모든 리스너를 동작시킨다.
+      notifyListeners();
+   }
+
+}
+```
+
+4. 프로바이더를 가져온다.
+```dart
+class _SearchScreenState extends State<SearchScreen> {
+
+   @override
+   Widget build(BuildContext context) {
+
+      // Provider를 가져온다.
+      var searchScreenProvider = Provider.of<TabPageIndexProvider>(context, listen: false);
+
+```
+
+5. 엔터키를 누르면 Provider의 메서드를 호출해준다.
+```dart
+   return SearchBar(
+      // 좌측에 배치되는 아이콘
+      leading: Icon(Icons.search),
+      // 내부 여백
+      padding: MaterialStatePropertyAll(EdgeInsets.fromLTRB(10, 0, 10, 0)),
+      // 키보드의 submit 버튼을 눌렀을 때
+      // value : 사용자가 입력한 내용이 들어온다.
+      onSubmitted: (value) {
+         // Provider의 set 메서드를 호출해준다.
+         searchScreenProvider.setKeyword(value);
+      },
+   );
+```
+
+6. SearchListView에서 Provider에 리스너를 연결해준다.
+```dart
+class _SearchListViewState extends State<SearchListView> {
+   @override
+   Widget build(BuildContext context) {
+
+      // Provider를 가져온다.
+      var searchScreenProvider = Provider.of<TabPageIndexProvider>(context, listen: false);
+
+      // 리스너를 연결해준다.
+      searchScreenProvider.addListener(() {
+         print("SearchListView : ${searchScreenProvider.searchKeyword}");
+      });
+```
+
+7. 검색 결과를 담을 리스트를 정의해준다.
+```dart
+class _SearchListViewState extends State<SearchListView> {
+   // 검색 결과 데이터를 담을 리스트
+   List<Map<String, dynamic>> searchResult = [];
+   // 검색 결과 영화 포스터를 담을 리스트
+   List<Image> posterData = [];
+
+```
+
+8. 리스트뷰의 항목의 개수를 변경한다.
+```dart
+   return ListView.builder(
+    itemCount: searchResult.length,
+    itemBuilder: (context, index) => makeListItem(context),
+   );
+```
+
+9. makeListItem 메서드를 호출할 때 전달하는 값을 추가해준다.
+```dart
+   return ListView.builder(
+    itemCount: searchResult.length,
+    itemBuilder: (context, index) => makeListItem(context, searchResult, posterData, index),
+   );
+```
+
+10. makeListItem 메서드의 매개변수를 변경해준다.
+```dart
+// 리스트뷰의 항목 하나를 구성하는 함수
+// 리스트뷰의 항목은 ListTitle을 사용해도 된다 대신 아이콘 사이즈 조절 불가
+Widget makeListItem(BuildContext context, List<Map<String, dynamic>> searchResult, List<Image> posterData, int index){ 
+```
+
+11. 전달받은 데이터로 항목을 구성하도록 코드를 수정해준다.
+```dart
+      child: Row(
+         children: [
+            posterData[index],
+            const Padding(padding: EdgeInsets.only(right: 10)),
+            Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: [
+                  Text(
+                     searchResult[index]['movie_title'],
+                     style: TextStyle(fontSize: 15)
+                  ),
+                  Text(
+                     '출연진 : ${searchResult[index]['movie_actor']}',
+                     style: TextStyle(fontSize: 12)
+                  ),
+                  Text(
+                     '제작진 : ${searchResult[index]['movie_director']}',
+                     style: TextStyle(fontSize: 12)
+                  ),
+               ],
+            )
+         ],
+      ),
+```
+
+12. 검색 결과를 가져오는 메서드를 만들어준다.
+```dart
+// 전체 영화 데이터에서 검색어에 해당하는 것만 모아 반환한다.
+Future<List<Map<String, dynamic>>> getSearchResult(String keyword) async {
+   // 검색 결과를 담을 리스트
+   List<Map<String, dynamic>> tempSearchResult = [];
+   // 모든 영화 정보를 가져온다.
+   List<Map<String, dynamic>> movieData = await getMovieData();
+
+   // 가져온 전체 영화의 수 만큼 반복한다.
+   for(var map in movieData){
+      // 현재 영화의 제목이 검색어를 포함하고 있다면 결과 리스트에 담아준다.
+      if(map['movie_title'].toString().contains(keyword)){
+         // 결과 리스트에 담아준다.
+         tempSearchResult.add(map);
+      }
+   }
+
+   return tempSearchResult;
+}
+```
+
+13. 검색된 영화의 포스터를 생성하여 반환하는 메서드를 만들어준다.
+```dart
+// 검색된 영화의 포스터를 만들어 반환한다.
+Future<List<Image>> getSearchPoster(List<Map<String, dynamic>> searchResult) async {
+
+   // 포스터를 담을 리스트
+   List<Image> searchPoster = [];
+
+   // 검색된 영화의 수 만큼 반복한다.
+   for(var map in searchResult){
+      // 이미지를 생성한다.
+      var tempImage = await getImageData(map['movie_poster']);
+      // 가로가 100사이즈의 이미지로 다시 생성해준다.
+      var tempImage2 = Image(image: tempImage.image, width: 100);
+      // 리스트에 담는다.
+      searchPoster.add(tempImage2);
+   }
+
+   return searchPoster;
+}
+```
+
+14. 프로바이더의 리스너 코드를 변경한다.
+```dart
+   // 리스너를 연결해준다.
+   searchScreenProvider.addListener(() async {
+      // print("SearchListView : ${searchScreenProvider.searchKeyword}");
+      // 검색 결과를 가져온다.
+      List<Map<String, dynamic>> tempSearchResult = await getSearchResult(searchScreenProvider.searchKeyword);
+      // 검색 결과 포스터를 가져온다.
+      posterData = await getSearchPoster(tempSearchResult);
+      // 상태를 설정해준다.
+      setState(() {
+        searchResult = tempSearchResult;
+      });
+   });
+```
+
+15. 출연진 등이 화면 밖을 벗어나는걸 대비하기 위해 overflow를 설정한다.
+```dart
+                Text(
+                  searchResult[index]['movie_title'],
+                  style: TextStyle(fontSize: 15),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  '출연진 : ${searchResult[index]['movie_actor']}',
+                  style: TextStyle(fontSize: 12),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  '제작진 : ${searchResult[index]['movie_director']}',
+                  style: TextStyle(fontSize: 12),
+                  overflow: TextOverflow.ellipsis,
+                ),
+```
+
+### 카메라, 앨범 연동하기
+
+1. pubspec.yaml 파일에 라이브러리를 추가한다.
+
+2. MyPageScreen에 프로필 이미지를 보여줄 이미지 객체를 생성한다.
+
+```dart
+
+  // 사용자 프로필 이미지
+  Image profileImage = Image.asset('lib/assets/images/youtube_logo.png');
+
+```
+
+3. 프로필 이미지를 보여주는 부분에 변수를 적용해준다.
+
+```dart
+                child: profileImage,
+```
+
+4. ImagePicker 객체를 생성한다.
+
+```dart
+
+  // 앨범이나 카메라에서 사진을 가져오기 위한 객체
+  ImagePicker imagePicker = ImagePicker();
+  // 앨범이나 카메라에서 사진을 가져오면 단말기 로컬 저장소에 저장이 된다.
+  // 저장된 사진의 경로를 담을 변수
+  String pickedImagePath = "";
+```
+
+5. 카메라, 앨범에 이미지를 가져오는 함수를 만들어준다.
+
+```dart
+
+  // 카메라나 앨범으로 부터 사진을 가져온다.
+  Future<void> getImage(ImageSource imageSource) async {
+    // 사진을 가져온다.
+    XFile? pickedImage = await imagePicker.pickImage(source: imageSource);
+    // 사진을 가져왔다면
+    if(pickedImage != null){
+      setState(() {
+        // 가져온 사진의 경로를 가져온다.
+        var xfileImage = XFile(pickedImage.path);
+        pickedImagePath = xfileImage.path;
+        // 사진을 보여준다.
+        profileImage = Image.file(File(pickedImagePath));
+      });
+    }
+  }
+
+```
+6. 카메라나 앨범 버튼을 누르면 메서드를 호출한다.
+
+```dart
+
+                IconButton(
+                  icon: Icon(Icons.camera_alt),
+                  onPressed: () {
+                    getImage(ImageSource.camera);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.photo_album),
+                  onPressed: () {
+                    getImage(ImageSource.gallery);
+                  },
+                ),
+
+```
+
+7. 파일을 서버에 업로드 하는 코드를 작성해준다.
+
+```dart
+// Storage에 이미지를 저장하는 함수
+// localImagePath : 단말기에 저장되어 있는 이미지의 경로
+// serverImagePath : 서버상에서의 이미지의 경로
+Future<void> uploadImage(String localImagePath, String serverImagePath) async {
+  await FirebaseStorage.instance.ref().child("user_image").child(serverImagePath).putFile(File(localImagePath));
+}
+
+```
+
+8. 저장 버튼을 눌렀을 때 업로드 되게 한다.
+
+```dart
+                // 이미지를 업로드 한다.
+                if(pickedImagePath != "") {
+                  uploadImage(pickedImagePath, "user_profile.jpg");
+                }
+```
+
+9. TextEditingcontroller를 만들어준다.
+
+```dart
+  // 입력 요소들과 연결될 컨트롤러
+  TextEditingController nameController = TextEditingController();
+  TextEditingController nickNameController = TextEditingController();
+```
+
+10. 각 입력 요소에 controller를 설정해준다.
+
+```dart
+              controller: nameController,
+
+              controller: nickNameController,          
+                  
+
+```
+
+11. 사용자 정보를 저장할 함수를 만들어준다.
+
+```dart
+// 사용자 정보를 서버에 저장한다.
+// 여기에서는 사용자가 한명 임을 가정한다.
+// add : 문서 추가
+// set : 문서 내의 모든 필드를 삭제 하고 다시 저장
+// update : 문서 내의 필드 일부를 수정
+Future<void> saveUserInfo(String name, String nickName, String profilePath) async {
+  await FirebaseFirestore.instance.collection("user_data").doc("user_profile").set({
+    "user_name" : name,
+    "user_nickname" : nickName,
+    "user_profilePath" : profilePath
+  });
+}
+
+```
+
+12. 사용자 정보를 저장하는 메서드를 호출해준다.
+
+```dart
+              onPressed: () async {
+                // 이미지를 업로드 한다.
+                if(pickedImagePath != "") {
+                  await uploadImage(pickedImagePath, "user_profile.jpg");
+                }
+                // 사용자 정보를 저장한다.
+                await saveUserInfo(nameController.text, nickNameController.text, "user_profile.jpg");
+                FocusScope.of(context).unfocus();
+              },
+
+              
+```
+
+13. 사용자 정보를 가져오는 메서드를 만들어준다
+
+```dart
+// 서버에 저장되어 있는 사용자 정보를 읽어와 반환한다.
+Future<Map<String, dynamic>?> getUserInfo() async {
+var querySnapShot = await FirebaseFirestore.instance.collection("user_data").doc("user_profile").get();
+// 반환할 사용자 정보
+Map<String, dynamic>? map = querySnapShot.data();
+
+return map;
+}
+
+```
+
+14. 사용자 정보를 가져와 출력해준다.
+
+```dart
+  // 사용자 정보를 가져와 설정하는 함수
+  Future<void> getUserData() async {
+    // 사용자 정보를 가져온다
+    var map1 = await getUserInfo();
+
+    setState(() {
+      nameController.text = map1!['user_name'].toString();
+      nickNameController.text = map1!['user_nickname'].toString();
+    });
+  }
+```
+
+15. initState에서 호출해준다.
+
+```dart
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // 사용자 정보를 가져와 설정해준다.
+    getUserData();
+  }
+
+
+```
+
+16. 사용자 이미지를 가져오는 함수를 만들어준다.
+
+```dart
+// 이미지 데이터를 가져온다
+Future<Image> getProfileImageData(String fileName) async {
+  // 이미지를 가져올 수 있는 주소를 가져온다
+  String imageUrl = await FirebaseStorage.instance.ref('user_image/$fileName').getDownloadURL();
+  // print(imageUrl);
+
+  // 이미지를 관리하는 객체
+  Image resultImage = Image.network(imageUrl);
+
+  return resultImage;
+}
+```
+
+17. 사용자 이미지를 가져와 변수에 넣어준다.
+
+```dart
+    profileImage = await getProfileImageData(map1!['user_profilePath']);
+```
+
+18. 받아온 사용자 정보가 있을 때만 동작하도록 한다.
+
+```dart
+    if(map1 != null) {
+      profileImage = await getProfileImageData(map1!['user_profilePath']);
+
+      setState(() {
+        nameController.text = map1!['user_name'].toString();
+        nickNameController.text = map1!['user_nickname'].toString();
+      });
+    }
+
+```
