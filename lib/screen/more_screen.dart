@@ -13,10 +13,10 @@ class _MoreScreenState extends State<MoreScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MoreTopAppBar(),
+      appBar: const MoreTopAppBar(),
       body: Container(
-        padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-        child: MoreListView(),
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        child: const MoreListView(),
       ),
     );
   }

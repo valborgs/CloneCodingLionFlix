@@ -37,7 +37,7 @@ class _HomeBoxSliderState extends State<HomeBoxSlider> {
     }
 
     return Container(
-      padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -76,13 +76,13 @@ Widget makeListItem(
       // DetailScreen을 띄운다.
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => DetailScreen(),
+          builder: (context) => DetailScreen(hotMovieData[index], hotMoviePoster[index]),
           fullscreenDialog: true
         )
       );
     },
     child: Container(
-      padding: EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.only(right: 10),
       child: hotMoviePoster[index],
     ),
   );

@@ -44,7 +44,7 @@ class _LionFlixAppState extends State<LionFlixApp> {
       // 화면 요소에서 프로바이더를 사용할 수 있도록 설정해준다.
       home: ChangeNotifierProvider(
         create: (BuildContext context) => TabPageIndexProvider(),
-        child: Scaffold(
+        child: const Scaffold(
           bottomNavigationBar: MainBottomNavigationBar(),
           body: MainScreen(),
         ),

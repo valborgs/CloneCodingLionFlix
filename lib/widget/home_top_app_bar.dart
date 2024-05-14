@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter03_lionflix/screen/drama_screen.dart';
 import 'package:flutter03_lionflix/screen/movie_screen.dart';
@@ -16,7 +15,7 @@ class HomeTopAppBar extends StatefulWidget implements PreferredSizeWidget {
   @override
   // TODO: implement preferredSize
   // Material3에서 정한 AppBar의 높이를 설정해준다.
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class _HomeTopAppBarState extends State<HomeTopAppBar> {
@@ -30,8 +29,8 @@ class _HomeTopAppBarState extends State<HomeTopAppBar> {
             'lib/assets/images/youtube_logo.png',
             fit: BoxFit.contain, height: 25,
           ),
-          Padding(padding: EdgeInsets.only(right: 10)),
-          Text("LionFlix"),
+          const Padding(padding: EdgeInsets.only(right: 10)),
+          const Text("LionFlix"),
         ],
       ),
       // 앱바 우측에 나타나는 메뉴들
@@ -45,25 +44,25 @@ class _HomeTopAppBarState extends State<HomeTopAppBar> {
                 ),
               );
             },
-            icon: Icon(Icons.tv)
+            icon: const Icon(Icons.tv)
         ),
         // 영화 메뉴
         IconButton(
             onPressed: (){
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => MovieScreen(),
+                  builder: (context) => const MovieScreen(),
                 ),
               );
             },
-            icon: Icon(Icons.movie)
+            icon: const Icon(Icons.movie)
         ),
         // 찜 메뉴
         IconButton(
             onPressed: () {
               // printTest();
             },
-            icon: Icon(Icons.favorite)
+            icon: const Icon(Icons.favorite)
         ),
       ],
 

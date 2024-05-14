@@ -53,13 +53,13 @@ class _MyPageScreenState extends State<MyPageScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: MyPageTopAppBar(),
+      appBar: const MyPageTopAppBar(),
       body: Container(
-        padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
         child: ListView(
           children: [
             // 상단 프로필 이미지
-            Container(
+            SizedBox(
               height: 100,
               child: Center(
                 child: profileImage,
@@ -87,7 +87,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
             const Padding(padding: EdgeInsets.only(top: 10)),
             // 이름 입력
             TextField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: '이름'
               ),
@@ -96,7 +96,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
             const Padding(padding: EdgeInsets.only(top: 10)),
             // 닉네임 입력
             TextField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: '닉네임'
               ),

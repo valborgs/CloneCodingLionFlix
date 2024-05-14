@@ -7,7 +7,7 @@ class DramaTopAppBar extends StatefulWidget implements PreferredSizeWidget {
   State<DramaTopAppBar> createState() => _DramaTopAppBarState();
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class _DramaTopAppBarState extends State<DramaTopAppBar> {
@@ -21,8 +21,8 @@ class _DramaTopAppBarState extends State<DramaTopAppBar> {
             fit: BoxFit.contain,
             height: 25,
           ),
-          Padding(padding: EdgeInsets.only(right: 10)),
-          Text('LionFlix'),
+          const Padding(padding: EdgeInsets.only(right: 10)),
+          const Text('LionFlix'),
         ],
       ),
     );

@@ -20,9 +20,9 @@ class _SearchSearchBarState extends State<SearchSearchBar> {
 
     return SearchBar(
       // 좌측에 배치되는 아이콘
-      leading: Icon(Icons.search),
+      leading: const Icon(Icons.search),
       // 내부 여백
-      padding: MaterialStatePropertyAll(EdgeInsets.fromLTRB(10, 0, 10, 0)),
+      padding: const MaterialStatePropertyAll(EdgeInsets.fromLTRB(10, 0, 10, 0)),
       // 키보드의 submit 버튼을 눌렀을 때
       // value : 사용자가 입력한 내용이 들어온다.
       onSubmitted: (value) {

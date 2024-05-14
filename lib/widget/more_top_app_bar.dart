@@ -7,7 +7,7 @@ class MoreTopAppBar extends StatefulWidget implements PreferredSizeWidget {
   State<MoreTopAppBar> createState() => _MoreTopAppBarState();
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class _MoreTopAppBarState extends State<MoreTopAppBar> {
@@ -21,8 +21,8 @@ class _MoreTopAppBarState extends State<MoreTopAppBar> {
             fit: BoxFit.contain,
             height: 25,
           ),
-          Padding(padding: EdgeInsets.only(right: 10)),
-          Text('LionFlix'),
+          const Padding(padding: EdgeInsets.only(right: 10)),
+          const Text('LionFlix'),
         ],
       ),
     );

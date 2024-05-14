@@ -29,13 +29,13 @@ class _MoreListViewState extends State<MoreListView> {
               // https://docs.flutter.dev/ui/widgets/animation
               PageRouteBuilder(
                 // 보여줄 화면 객체를 지정한다.
-                pageBuilder: (context, animation, secondaryAnimation) => MyPageScreen(),
+                pageBuilder: (context, animation, secondaryAnimation) => const MyPageScreen(),
                 // 화면 전환 애니메이션 구성
                 // animation : 기본 애니메이션 정보가 설정되어있는 객체
                 // child : 새롭게 나타나는 화면 객체, pageBuilder에서 반환한 화면 객체
                 transitionsBuilder: (context, animation, secondaryAnimation, child) {
                   // 새로 나타나는 화면 초기 위치(가로축 길이 비율, 세로축 길이 비율)
-                  var begin = Offset(1.0, 0.0);
+                  var begin = const Offset(1.0, 0.0);
                   // 새로 나타나는 화면의 마지막 위치
                   // var end = Offset(0.0, 0.0);
                   var end = Offset.zero;
@@ -54,22 +54,22 @@ class _MoreListViewState extends State<MoreListView> {
               )
             );
           },
-          child: Text('마이 페이지', style: TextStyle(fontSize: 20)),
+          child: const Text('마이 페이지', style: TextStyle(fontSize: 20)),
+        ),
+        const Divider(),
+        InkWell(
+          onTap: () {},
+          child: const Text('메뉴1', style: TextStyle(fontSize: 20)),
+        ),
+        const Divider(),
+        InkWell(
+          onTap: () {},
+          child: const Text('메뉴2', style: TextStyle(fontSize: 20)),
         ),
         Divider(),
         InkWell(
           onTap: () {},
-          child: Text('메뉴1', style: TextStyle(fontSize: 20)),
-        ),
-        Divider(),
-        InkWell(
-          onTap: () {},
-          child: Text('메뉴2', style: TextStyle(fontSize: 20)),
-        ),
-        Divider(),
-        InkWell(
-          onTap: () {},
-          child: Text('메뉴3', style: TextStyle(fontSize: 20)),
+          child: const Text('메뉴3', style: TextStyle(fontSize: 20)),
         ),
       ],
     );

@@ -48,14 +48,18 @@ class _SearchListViewState extends State<SearchListView> {
 
 // 리스트뷰의 항목 하나를 구성하는 함수
 // 리스트뷰의 항목은 ListTitle을 사용해도 된다 대신 아이콘 사이즈 조절 불가
-Widget makeListItem(BuildContext context, List<Map<String, dynamic>> searchResult, List<Image> posterData, int index){
+Widget makeListItem(
+    BuildContext context,
+    List<Map<String, dynamic>> searchResult,
+    List<Image> posterData,
+    int index){
   return Container(
     padding: const EdgeInsets.only(top: 10),
     child: InkWell(
       onTap: () {
         Navigator.of(context).push(
             MaterialPageRoute(
-                builder: (context) => DetailScreen(),
+                builder: (context) => DetailScreen(searchResult[index], posterData[index]),
                 fullscreenDialog: true
             )
         );
@@ -70,17 +74,17 @@ Widget makeListItem(BuildContext context, List<Map<String, dynamic>> searchResul
               children: [
                 Text(
                   searchResult[index]['movie_title'],
-                  style: TextStyle(fontSize: 15),
+                  style: const TextStyle(fontSize: 15),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   '출연진 : ${searchResult[index]['movie_actor']}',
-                  style: TextStyle(fontSize: 12),
+                  style: const TextStyle(fontSize: 12),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   '제작진 : ${searchResult[index]['movie_director']}',
-                  style: TextStyle(fontSize: 12),
+                  style: const TextStyle(fontSize: 12),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -97,8 +101,8 @@ Widget makeListItem(BuildContext context, List<Map<String, dynamic>> searchResul
 Widget makeListItem2(){
   return ListTile(
     leading: Image.asset('lib/assets/images/movie6.jpg'),
-    title: Text('영화 제목'),
-    subtitle: Text('출연진 : 배우1, 배우2, 배우3\n제작진 : 제작1, 제작2, 제작3',),
+    title: const Text('영화 제목'),
+    subtitle: const Text('출연진 : 배우1, 배우2, 배우3\n제작진 : 제작1, 제작2, 제작3',),
     isThreeLine: true,
     onTap: () {},
   );

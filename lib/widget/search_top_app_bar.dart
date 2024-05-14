@@ -7,7 +7,7 @@ class SearchTopAppBar extends StatefulWidget implements PreferredSizeWidget {
   State<SearchTopAppBar> createState() => _SearchTopAppBarState();
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class _SearchTopAppBarState extends State<SearchTopAppBar> {
@@ -22,8 +22,8 @@ class _SearchTopAppBarState extends State<SearchTopAppBar> {
             fit: BoxFit.contain,
             height: 25,
           ),
-          Padding(padding: EdgeInsets.only(right: 10)),
-          Text("LionFlix"),
+          const Padding(padding: EdgeInsets.only(right: 10)),
+          const Text("LionFlix"),
         ],
       ),
     );

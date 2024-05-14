@@ -25,7 +25,7 @@ class _MainBottomNavigationBarState extends State<MainBottomNavigationBar> {
     // 하단에 배치될 네비게이션 바
     return NavigationBar(
       // 네비게이션 바를 구성하는 아이콘들
-      destinations: [
+      destinations: const [
         NavigationDestination(
           // 평상시의 아이콘
           icon: Icon(Icons.home_outlined),

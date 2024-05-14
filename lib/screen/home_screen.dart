@@ -21,6 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Image> posterData = [];
   // 지금 뜨는 콘텐츠 정보를 담을 리스트
   List<int> hotMovie = [];
+  // 찜한 영화 번호를 담을 리스트
+  List<int> likeMovie = [];
 
   // 화면이 보여질 때마다 호출되는 함수
   @override
@@ -55,6 +57,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // 지금 뜨는 콘텐츠 정보를 받아온다.
     hotMovie = await getHotMovieList();
 
+    // 찜한 영화 번호 정보를 받아온다.
+    likeMovie = await getLikeMovieList();
+
     // 영화 데이터를 통해 상태를 설정한다.
     setState(() {
       movieData = tempMovieData;
@@ -88,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: ListView(
           children: [
             // 상단 회전 목마
-            HomeCarouselSlider(movieData, posterData),
+            HomeCarouselSlider(movieData, posterData, likeMovie),
             Padding(padding: EdgeInsets.only(top: 20)),
             // 미리 보기 부분
             HomeCircleSlider(movieData, posterData),

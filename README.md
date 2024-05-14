@@ -3309,3 +3309,622 @@ Future<Image> getProfileImageData(String fileName) async {
     }
 
 ```
+
+## 2024-05-14
+
+### Flutter에서 Firebase Where 함수
+flutter에서 firebase 사용시 조건에 관련된 것은 모두 where 함수를 사용한다.
+where 함수의 매개변수를 통해서 어떠한 조건인지를 설정한다.
+- 첫 번째 매개변수 : 필드 이름
+- isEqualTo : 값을 지정한다. 필드의 값이 지정된 값과 같은 것
+- isNotEqualTo : 값을 지정한다. 필드의 값이 지정된 값과 다른 것
+- isLessThan : 값을 지정한다. 필드의 값이 지정된 값보다 작은 것
+- isLessThanOrEqualTo : 값을 지정한다. 필드의 값이 지정된 값보다 작거나 같은 것
+- isGreaterThan : 값을 지정한다. 필드의 값이 지정된 값보다 큰 것
+- isGraterThanOrEqualTo : 값을 지정한다. 필드의 값이 지정된 값보다 크거나 같은 것
+- arrayContains : 값을 지정한다. 지정된 필드가 배열 값을 저장하고 있어야 하고 저장된 배열 내의 값이 지정된 값이 포함되어 있는 것
+- arrayContainsAny : 배열이나 리스트를 지정한다. 필드에 저장되어 있는 값은 배열이어야 한다. 필드에 저장되어 있는 값이 지정된 배열이나 리스트 안에 포함되어 있는 것
+예) 필드 a1의 값이 1이거나 2인 문서들을 모두 가져온다.
+- whereIn : 배열이나 리스트를 지정한다. 필드의 저장된 것이 리스트가 아닌 값. 필드의 저장된 것이 값이 지정된 배열이나 리스트 안에 포함되어 있는 것
+- whereNotIn : 배열이나 리스트를 지정한다. 필드의 저장된 것이 리스트가 아닌 값. 필드의 저장된 것이 값이 지정된 배열이나 리스트 안에 포함되어 있지 않는 것
+- isNull : true나 false를 지정한다. true를 지정할 경우 지정된 필드의 값이 null인 문서들을 가져오고
+         false인 경우에는 지정된 필드의 값이 null이 아닌 문서들을 가져온다.
+
+### 드라마 혹은 영화만 모아서 보여주는 화면 구성
+- 드라마 화면에 대한 작업을 수행하고 영화 화면에 코드를 복붙해서 수정한다.
+
+1. 타입에 따른 영상 정보를 가져오는 함수를 작성한다.
+```dart
+// 타입에 따라 영상 정보를 가져오는 함수
+Future<List<Map<String, dynamic>>> getMovieDataByType(int movieType) async {
+   var querySnapShot = await FirebaseFirestore.instance.collection('movie_data').where('movie_type', isEqualTo: movieType ).get();
+
+   // 데이터를 담을 리스트
+   List<Map<String, dynamic>> results = [];
+
+   // 데이터를 리스트에 담아준다.
+   // 컬렉션에 담긴 모든 문서를 가져와 반복한다.
+   for(var doc in querySnapShot.docs){
+      // 문서에 담긴 데이터를 맵으로 추출하여 리스트에 담는다.
+      results.add(doc.data());
+   }
+
+   return results;
+} 
+```
+
+2. 데이터를 담을 변수를 정의해준다.
+
+```dart
+class _DramaScreenState extends State<DramaScreen> {
+   // 영화 데이터를 담을 변수
+   List<Map<String, dynamic>> movieData = [];
+   // 영화 포스터를 담을 상태 변수
+   List<Image> posterData = [];
+```
+
+3. 서버에서 데이터를 받아오고 포스터 이미지 객체를 생성하는 메서드를 작성한다.
+```dart
+  // 영화 데이터를 가져오는 메서드
+Future<void> getData() async {
+   // 영화 데이터를 가져온다.
+   var tempMovieData = await getMovieDataByType(1);
+
+   // 영화의 수 만큼 이미지 객체를 만들어준다.
+   posterData = List<Image>.generate(
+           tempMovieData.length,
+                   (index) => Image.asset('lib/assets/images/loading.gif')
+   );
+
+   // 영화 데이터를 통해 상태를 설정한다.
+   setState(() {
+      movieData = tempMovieData;
+   });
+
+   // 포스터 데이터를 받아오며 상태를 설정한다.
+   for(int i=0; i<tempMovieData.length; i++){
+      // i번째 영화 포스터 객체를 가져온다.
+      var tempImage = await getImageData(tempMovieData[i]['movie_poster']);
+      setState(() {
+         posterData[i] = tempImage;
+      });
+   }
+}
+```
+
+4. initState에서 getData를 호출한다.
+```dart
+   @override
+   void initState() {
+      super.initState();
+      getData();
+   }
+```
+
+5. GridView에 항목 개수를 설정해준다.
+```dart
+      body: GridView.builder(
+         // 보여줄 항목의 개수
+         itemCount: movieData.length,
+```
+
+6. 항목 하나를 구성하는 함수를 수정해준다.
+- 매개변수 변경
+- child의 설정되는 이미지 변경
+```dart
+
+// 그리드 뷰의 항목 하나를 구성하는 함수
+Widget makeGridItem(BuildContext context, List<Map<String, dynamic>> movieData, List<Image> posterData, int index){
+  return InkWell(
+    onTap: () {
+      Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => DetailScreen(),
+            fullscreenDialog: true,
+          )
+      );
+    },
+    child: posterData[index],
+  );
+}
+```
+
+7. makeGridItem 함수 호출 부분을 변경한다.
+```dart
+itemBuilder: (context, index) => makeGridItem(context, movieData, posterData, index),
+```
+
+8. movie_screen.dart에도 똑같이 적용해준다.
+
+### 영화 찜 처리
+
+1. 찜한 영화 정보의 번호를 가져오는 함수를 작성한다.
+```dart
+// 찜한 영화 정보를 가져오는 함수
+Future<List<int>> getLikeMovieList() async {
+   // 찜한 영화의 번호 정보를 가져온다.
+   var querySnapShot = await FirebaseFirestore.instance.collection('movie_like').doc('like_doc').get();
+   // 데이터를 담을 리스트
+   List<int> results = [];
+
+   var map = querySnapShot.data();
+
+   // 컬렉션과 문서가 있을 경우
+   if(map != null){
+      // likes 필드의 저장되어 있는 배열을 가져와 담아준다.
+      for(var idx in map['likes']){
+         results.add(idx);
+      }
+   }
+
+   return results;
+}
+```
+
+2. 찜한 영화 정보를 담을 변수를 선언해준다.
+```dart
+class _HomeScreenState extends State<HomeScreen> {
+
+   // 영화 데이터를 담을 상태 변수
+   List<Map<String, dynamic>> movieData = [];
+   // 영화 포스터를 담을 상태 변수
+   List<Image> posterData = [];
+   // 지금 뜨는 콘텐츠 정보를 담을 리스트
+   List<int> hotMovie = [];
+   // 찜한 영화 번호를 담을 리스트
+   List<int> likeMovie = [];
+```
+
+3. 찜한 영화 번호를 가져오는 함수를 호출해준다.
+```dart
+  Future<void> getData() async {
+   // 영화 데이터를 가져온다.
+   var tempMovieData = await getMovieData();
+   // print('home screen - $tempMovieData');
+
+   // getImageData(tempMovieData.first['movie_poster']);
+
+   // 영화의 수 만큼 이미지 객체를 만들어준다.
+   posterData = List<Image>.generate(
+      // 리스트가 담을 객체의 개수
+      tempMovieData.length,
+      // 리스트가 담을 객체를 생성해 반환해준다.
+              (index) => Image.asset('lib/assets/images/loading.gif'),
+   );
+
+   // 지금 뜨는 콘텐츠 정보를 받아온다.
+   hotMovie = await getHotMovieList();
+
+   // 찜한 영화 번호 정보를 받아온다.
+   likeMovie = await getLikeMovieList();
+```
+
+4. 회전 목마 객체를 생성할 때 전달해준다.
+```dart
+   body: ListView(
+      children: [
+         // 상단 회전 목마
+         HomeCarouselSlider(movieData, posterData, likeMovie),
+```
+
+5. 찜한 영화 번호를 담을 변수를 선언해주고 생성자를 수정해준다.
+```dart
+class HomeCarouselSlider extends StatefulWidget {
+
+   // 영화 데이터를 담을 상태 변수
+   List<Map<String, dynamic>> movieData;
+   // 영화 포스터를 담을 상태 변수
+   List<Image> posterData;
+   // 찜한 영화 번호를 담을 상태 변수
+   List<int> likeMovie;
+
+   HomeCarouselSlider(this.movieData, this.posterData, this.likeMovie, {super.key});
+
+```
+
+6. 회전 목마를 통해 보여주는 현재의 영화의 번호가 찜한 영화에 포함되어 있는지 여부로 버튼을 변경하도록 수정해준다.
+```dart
+   // 찜
+   Column(
+      children: [
+         // 현재 보여지는 영화의 번호가 찜한 영화 리스트에 있는지
+         widget.likeMovie.contains(widget.movieData[imagePosition]['movie_idx'])
+            ? IconButton(onPressed: () {}, icon: Icon(Icons.check))
+            : IconButton(onPressed: () {}, icon: Icon(Icons.add)),
+         const Text("내가 찜한 콘텐츠", style: TextStyle(fontSize: 11)),
+      ],
+   ),
+```
+
+7. 찜 영화 정보를 새롭게 저장하는 함수를 작성한다.
+```dart
+// 찜한 영화 정보를 새롭게 저장하는 함수
+Future<void> setLikeMovie(List<int> likeMovie) async {
+  await FirebaseFirestore.instance.collection('movie_like').doc('like_doc').set({
+    'likes' : likeMovie,
+  });
+} 
+```
+
+8. 찜 관련 버튼의 리스너를 작성해준다.
+```dart
+Column(
+    children: [
+        // 현재 보여지는 영화의 번호가 찜한 영화 리스트에 있는지
+        widget.likeMovie.contains(widget.movieData[imagePosition]['movie_idx'])
+            ? IconButton(
+                onPressed: () {
+                    setState(() {
+                        // 현재의 영화 번호를 likeMovie에서 제거한다.
+                        widget.likeMovie.remove(widget.movieData[imagePosition]['movie_idx']);
+                        // 저장한다.
+                        setLikeMovie(widget.likeMovie);
+                    });
+                },
+                icon: const Icon(Icons.check),
+            )
+            : IconButton(
+                onPressed: () {
+                    setState(() {
+                        // 현재의 영화 번호를 likeMovie에 저장한다.
+                        widget.likeMovie.add(widget.movieData[imagePosition]['movie_idx']);
+                        // 저장한다.
+                        setLikeMovie(widget.likeMovie);
+                    });
+                },
+                icon: const Icon(Icons.add)
+            ),
+        const Text("내가 찜한 콘텐츠", style: TextStyle(fontSize: 11)),
+    ],
+),
+```
+
+
+### saved 탭 화면 구현
+
+1. 영화 번호들을 받아 해당 영화 데이터를 반환하는 함수를 만들어준다.
+```dart
+// 전달되는 영화 번호에 해당하는 영화 데이터를 반환한다.
+// 영화 데이터 전체를 가져오는 함수
+Future<List<Map<String, dynamic>>> getMovieDataByMovieIndexes(List<int> movieIndexes) async {
+
+
+   // 데이터를 담을 리스트
+   List<Map<String, dynamic>> results = [];
+
+   if(movieIndexes.isNotEmpty){
+      // movie_data 컬렉션에 저장되어 있는 모든 문서를 가져온다.
+      var querySnapShot = await FirebaseFirestore.instance.collection('movie_data').where('movie_idx', whereIn: []).get();
+
+      // 데이터를 리스트에 담아준다.
+      // 컬렉션에 담긴 모든 문서를 가져와 반복한다.
+      for(var doc in querySnapShot.docs){
+         // 문서에 담긴 데이터를 맵으로 추출하여 리스트에 담는다.
+         results.add(doc.data());
+      }
+   }
+
+   return results;
+}
+```
+
+2. 데이터를 담을 변수를 선언해준다.
+```dart
+class _LikeScreenState extends State<LikeScreen> {
+
+   // 영화 데이터를 담을 상태 변수
+   List<Map<String, dynamic>> movieData = [];
+   // 영화 포스터를 담을 상태 변수
+   List<Image> posterData = [];
+   // 찜한 영화 번호를 담을 상태 변수
+   List<int> likeMovie = [];
+```
+
+3. 데이터를 받아오는 함수를 작성해준다.
+```dart
+  // 데이터를 가져오는 함수
+Future<void> getData() async {
+   // 찜한 영화 번호 정보를 받아온다.
+   likeMovie = await getLikeMovieList();
+
+   // 영화 데이터를 가져온다.
+   var tempMovieData = await getMovieDataByMovieIndexes(likeMovie);
+
+   // 영화의 수 만큼 이미지 객체를 만들어준다.
+   posterData = List<Image>.generate(
+      // 리스트가 담을 객체의 개수
+      tempMovieData.length,
+      // 리스트가 담을 객체를 생성해 반환해준다.
+              (index) => Image.asset('lib/assets/images/loading.gif'),
+   );
+
+   // 영화 데이터를 통해 상태를 설정한다.
+   setState(() {
+      movieData = tempMovieData;
+   });
+
+   // 포스터 데이터를 받아오며 상태를 설정해준다.
+   for(int i=0; i<tempMovieData.length; i++){
+      // i번째 영화 포스터 객체를 가져온다.
+      var tempImage = await getImageData(tempMovieData[i]['movie_poster']);
+      // 받아온 이미지 객체를 포스터를 담을 리스트에 담아주고 상태를 설정한다.
+      setState(() {
+         posterData[i] = tempImage;
+      });
+   }
+}
+```
+
+4. initState에서 getData를 호출해준다.
+```dart
+   @override
+   void initState() {
+      super.initState();
+      getData();
+   }
+```
+
+5. LikeListView의 생성자를 통해 데이터를 전달한다.
+```dart
+  @override
+Widget build(BuildContext context) {
+   return Scaffold(
+      appBar: LikeTopAppBar(),
+      body: Container(
+         padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+         child: LikeListView(movieData, posterData, likeMovie),
+      ),
+   );
+}
+```
+
+6. 전달되는 데이터를 생성자로 받는다.
+```dart
+class LikeListView extends StatefulWidget {
+
+   // 영화 데이터를 담을 상태 변수
+   List<Map<String, dynamic>> movieData;
+   // 영화 포스터를 담을 상태 변수
+   List<Image> posterData;
+   // 찜한 영화 번호를 담을 상태 변수
+   List<int> likeMovie;
+
+   LikeListView(this.movieData, this.posterData, this.likeMovie, {super.key});
+
+   @override
+   State<LikeListView> createState() => _LikeListViewState();
+}
+```
+
+7. 리스트뷰의 항목 개수를 영화의 수로 변경한다.
+```dart
+class _LikeListViewState extends State<LikeListView> {
+   @override
+   Widget build(BuildContext context) {
+      return ListView.builder(
+         itemCount: widget.movieData.length,
+         itemBuilder: (context, index) => makeListItem(context),
+      );
+   }
+}
+```
+
+8. 항목을 구성하는 메서드에 데이터들을 전달한다.
+```dart
+class _LikeListViewState extends State<LikeListView> {
+   @override
+   Widget build(BuildContext context) {
+      return ListView.builder(
+         itemCount: widget.movieData.length,
+         itemBuilder: (context, index) => makeListItem(context, widget.movieData, widget.posterData, widget.likeMovie, index),
+      );
+   }
+}
+ 
+```
+
+9. makeListItem 함수의 매개변수를 변경한다.
+```dart
+// 리스트 뷰의 항목 하나를 구성하는 함수
+Widget makeListItem(int index){
+
+```
+
+10. 항목을 구성하는 코드를 변경한다.
+- Image 부분 변경
+- Text 3개 변경
+```dart
+   Expanded(
+      child:Row(
+         children: [
+            Image(image: widget.posterData[index].image, width: 100),
+            const Padding(padding: EdgeInsets.only(right: 10)),
+            Expanded(
+               child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                     Text(widget.movieData[index]['movie_title'], overflow: TextOverflow.ellipsis),
+                     Text('출연진 : ${widget.movieData[index]['movie_actor']}', overflow: TextOverflow.ellipsis),
+                     Text('제작진 : ${widget.movieData[index]['movie_director']}', overflow: TextOverflow.ellipsis),
+                  ],
+               ),
+            ),
+         ],
+      ),
+   ),
+```
+
+11. 삭제 아이콘을 누르면 항목을 삭제하고 찜 데이터도 새롭게 저장해준다.
+```dart
+   IconButton(
+      onPressed: () {
+         // index번째 항목을 제거한다.
+         setState(() {
+            widget.movieData.removeAt(index);
+            widget.posterData.removeAt(index);
+            widget.likeMovie.removeAt(index);
+         });
+         // 찜 데이터를 새롭게 저장한다.
+         setLikeMovie(widget.likeMovie);
+      },
+      icon: const Icon(Icons.delete)
+   ),
+```
+
+### 상세 화면 구현
+
+1. DetailScreen에 영화 정보와 포스터를 담을 변수를 선언하고 생성자를 추가한다.
+```dart
+class DetailScreen extends StatefulWidget {
+
+   // 영화 데이터
+   Map<String, dynamic> movieData = Map<String, dynamic>();
+   // 포스터
+   Image posterData= Image.asset('lib/assets/images/youtube_logo.gif');
+
+   DetailScreen.test(this.movieData, this.posterData{super.key});
+
+   DetailScreen({super.key});
+
+   @override
+   State<DetailScreen> createState() => _DetailScreenState();
+}
+```
+
+2. home_carousel_slider에서 정보 아이콘을 눌렀을때 생성하는 DetailScreen의 생성자를 수정한다.
+```dart
+   // 정보
+   Column(
+      children: [
+         IconButton(
+            onPressed: () {
+               // DetailScreen을 띄워준다.
+               Navigator.of(context).push(
+                  MaterialPageRoute(
+                     // 보여질 다음 화면을 설정한다.
+                     builder: (context) => DetailScreen.test(widget.movieData[imagePosition], widget.posterData[imagePosition]),
+                     // 다이얼로그로 보여지게 한다.
+                     fullscreenDialog: true
+                  )
+               );
+            },
+            icon: Icon(Icons.info)
+         ),
+         Text("정보", style: TextStyle(fontSize: 11))
+      ],
+   ),
+```
+
+3. DetailScreen에서 배경 이미지를 변경한다.
+```dart
+class _DetailScreenState extends State<DetailScreen> {
+   @override
+   Widget build(BuildContext context) {
+      return Scaffold(
+              body: ListView(
+              children: [
+              Stack(
+              children: [
+              Container(
+              // 배경 이미지를 깔아준다.
+              width: double.maxFinite,
+              decoration: BoxDecoration(
+              image: DecorationImage(
+              image: widget.posterData.image,
+```
+
+4. 포스터 이미지를 변경한다.
+```dart
+   // 포스터 이미지
+   Container(
+      padding: EdgeInsets.fromLTRB(0, 45, 0, 10),
+      child: widget.posterData,
+      height: 300,
+   ),
+```
+
+5. 영화 정보를 보여주는 곳을 수정한다.
+```dart
+   // 설명
+   Container(
+      padding: EdgeInsets.all(7),
+      child: Text(
+         widget.movieData['movie_info'],
+         textAlign: TextAlign.center,
+         style: TextStyle(fontSize: 13),
+      ),
+   ),
+```
+
+6. 영화 제목을 수정해준다.
+```dart
+   // 영화 제목
+   Container(
+      padding: EdgeInsets.all(7),
+      child: Text(
+         widget.movieData['movie_title'],
+         textAlign: TextAlign.center,
+         style: TextStyle(fontSize: 16),
+      ),
+   ), 
+```
+
+7. 영화 설명을 수정해준다.
+```dart
+   // 영화 설명
+   Container(
+      padding: EdgeInsets.all(5),
+      child: Text(widget.movieData['movie_detail_info']),
+   ), 
+```
+
+8. 출연 배우를 수정해준다.
+```dart
+   // 출연진
+   Container(
+      padding: EdgeInsets.all(5),
+      alignment: Alignment.centerLeft,
+      child: Text(
+         '출연 : ${widget.movieData['movie_actor']}',
+         style: TextStyle(
+            color: Colors.white60,
+            fontSize: 12
+         ),
+      ),
+   ),
+```
+
+9. 제작진을 수정해준다.
+```dart
+   // 제작진
+   Container(
+      padding: EdgeInsets.all(5),
+      alignment: Alignment.centerLeft,
+      child: Text(
+         '제작진 : ${widget.movieData['movie_director']}',
+         style: TextStyle(
+            color: Colors.white60,
+            fontSize: 12
+         ),
+      ),
+   ), 
+```
+
+10. DetailScreen의 생성자를 수정해준다.
+```dart
+class DetailScreen extends StatefulWidget {
+
+  // 영화 데이터
+  Map<String, dynamic> movieData = Map<String, dynamic>();
+  // 포스터
+  Image posterData= Image.asset('lib/assets/images/youtube_logo.gif');
+
+  DetailScreen(this.movieData, this.posterData, {super.key});
+
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+} 
+```
+
+11. DetailScreen 객체 생성하는 모든 부분들을 수정한다.
+- DetailScreen객체를 생성하고있는 파일을 모두 열어 오류가 떠있는 부분들을 찾아 수정한다.

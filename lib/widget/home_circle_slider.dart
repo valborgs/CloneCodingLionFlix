@@ -20,12 +20,12 @@ class _HomeCircleSliderState extends State<HomeCircleSlider> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("미리보기"),
-          Container(
+          const Text("미리보기"),
+          SizedBox(
             // 리스트 뷰의 크기를 컨테이너를 통해 설정한다.
             height: 120,
             // 다수의 항목을 보여주는 리스트 뷰는 builder를 통해 구성한다.
@@ -67,13 +67,13 @@ Widget makeListItem(
       // DetailScreen을 띄운다.
       Navigator.of(context).push(
           MaterialPageRoute(
-              builder: (context) => DetailScreen(),
+              builder: (context) => DetailScreen(movieData[index], posterData[index]),
               fullscreenDialog: true
           )
       );
     },
     child: Container(
-      padding: EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.only(right: 10),
       // 동그라미 형태로 보여주는 컨테이너
       child: CircleAvatar(
         // 배경 이미지

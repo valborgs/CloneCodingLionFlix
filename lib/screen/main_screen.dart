@@ -33,10 +33,10 @@ class _MainScreenState extends State<MainScreen> {
 
     return Container(
       child: [
-        HomeScreen(),
-        SearchScreen(),
-        LikeScreen(),
-        MoreScreen(),
+        const HomeScreen(),
+        const SearchScreen(),
+        const LikeScreen(),
+        const MoreScreen(),
       ][currentPageIndex],
     );
   }
